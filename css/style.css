@@ -161,6 +161,14 @@ body {
     color: var(--text-muted);
 }
 
+.login-box form,
+.login-box .form-group,
+.login-box input,
+.login-box .btn-primary {
+    width: 100%;
+    box-sizing: border-box;
+}
+
 #email,
 #password {
     background: #FFFFFF;
@@ -171,10 +179,8 @@ body {
 
 .btn-login {
     display: block;
-    width: 100%;
-    max-width: 200px;
     height: 48px;
-    margin: 24px auto 0;
+    margin-top: 24px;
     text-align: center;
     border-radius: 8px;
     color: #261A0C;
@@ -835,26 +841,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     position: relative;
 }
 
-/* === Stamp Groups (value-stamp tag chips split into mini cards) === */
-.stamp-group {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 10px 12px;
-    margin-bottom: 10px;
-}
-
-.stamp-group:last-child {
-    margin-bottom: 0;
-}
-
-.stamp-group h5 {
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: var(--heading);
-    margin-bottom: 8px;
-}
-
+/* === Stamp Grid (value-stamp tag chips, life/study segments divided by a thin rule) === */
 .stamp-group-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
