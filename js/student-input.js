@@ -30,7 +30,7 @@ async function loadValueTypes() {
         <label class="checkbox-label">
             <input type="checkbox" name="value-stamp" value="${vt.id}" data-points="${vt.points}" data-name="${vt.name}"
                 onchange="this.closest('.stamp-count-item').querySelector('.stamp-count').disabled = !this.checked; updatePreview();">
-            <span>${vt.name} (${vt.points}%)</span>
+            <span>${vt.name}</span>
         </label>
         <input type="number" class="stamp-count input-small" min="1" max="20" value="1" disabled
             data-vt-id="${vt.id}" oninput="updatePreview();">
