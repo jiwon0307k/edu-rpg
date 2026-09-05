@@ -288,7 +288,7 @@ async function loadStudentEntries(studentId, studentName) {
             const noteText = p.note ? ` (${p.note})` : '';
             const countText = (p.count || 1) > 1 ? ` x${p.count}` : '';
             let cells = `<td>${p.date}</td>`;
-            cells += `<td colspan="${midCols}" class="penalty-label">⚠️ ${p.penalty_type_name}${countText}${noteText}</td>`;
+            cells += `<td colspan="${midCols}" class="penalty-label">🚨 ${p.penalty_type_name}${countText}${noteText}</td>`;
             cells += `<td class="penalty-xp">-${p.xp_deducted}%</td>`;
             cumulativeXP -= p.xp_deducted;
             if (cumulativeXP < 0) cumulativeXP = 0;

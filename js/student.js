@@ -203,7 +203,7 @@ async function loadProgressTable() {
             const descCell = document.createElement('td');
             descCell.colSpan = colCount;
             descCell.className = 'penalty-label';
-            descCell.textContent = `⚠️ ${p.penalty_type_name}`;
+            descCell.textContent = `🚨 ${p.penalty_type_name}`;
             row.appendChild(descCell);
 
             const xpCell = document.createElement('td');
