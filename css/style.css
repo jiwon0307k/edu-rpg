@@ -1,20 +1,22 @@
-/* === Edu-RPG: RPG-themed CSS === */
+/* === Edu-RPG: Warm Butter Yellow Theme === */
 
 :root {
-    --primary: #e5a13a;
-    --primary-dark: #c98527;
-    --primary-light: #f5c873;
-    --secondary: #636e72;
-    --success: #00b894;
-    --danger: #d63031;
-    --warning: #fdcb6e;
-    --bg: #1a1a2e;
-    --bg-card: #16213e;
-    --bg-card-lighter: #1c2a4a;
-    --text: #e0e0e0;
-    --text-muted: #8899aa;
-    --border: #2d3748;
-    --gold: #ffd700;
+    --primary: #EBB738;
+    --primary-dark: #DE9E1E;
+    --primary-light: #F7E6AE;
+    --secondary: #B9A06B;
+    --secondary-dark: #A08A56;
+    --success: #1F8A4C;
+    --danger: #C0392B;
+    --danger-dark: #A93226;
+    --warning: #9C6B0B;
+    --bg: #FEFBF3;
+    --bg-card: #FFF3CD;
+    --bg-card-lighter: #FDEEB7;
+    --text: #3D3019;
+    --heading: #2B2111;
+    --text-muted: #8A7A52;
+    --border: #E8D9A0;
 }
 
 * {
@@ -35,16 +37,16 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 24px;
+    padding: 16px 28px;
     background: var(--bg-card);
     border-bottom: 2px solid var(--primary);
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 12px;
 }
 
 .nav-left h2 {
     font-size: 1.2rem;
-    color: var(--gold);
+    color: var(--heading);
 }
 
 .nav-right {
@@ -55,7 +57,7 @@ body {
 }
 
 .nav-user {
-    color: var(--primary-light);
+    color: var(--heading);
     font-weight: bold;
 }
 
@@ -70,11 +72,12 @@ body {
     font-weight: 600;
     text-decoration: none;
     transition: all 0.2s;
+    white-space: nowrap;
 }
 
 .btn-primary {
     background: var(--primary);
-    color: #2b1d00;
+    color: var(--heading);
 }
 .btn-primary:hover {
     background: var(--primary-dark);
@@ -83,10 +86,10 @@ body {
 
 .btn-secondary {
     background: var(--secondary);
-    color: white;
+    color: var(--heading);
 }
 .btn-secondary:hover {
-    background: #4a5568;
+    background: var(--secondary-dark);
 }
 
 .btn-danger {
@@ -94,7 +97,7 @@ body {
     color: white;
 }
 .btn-danger:hover {
-    background: #c0392b;
+    background: var(--danger-dark);
 }
 
 .btn-small {
@@ -123,7 +126,7 @@ body {
     padding: 40px;
     width: 100%;
     max-width: 400px;
-    box-shadow: 0 0 30px rgba(229, 161, 58, 0.2);
+    box-shadow: 0 0 30px rgba(235, 183, 56, 0.25);
 }
 
 .login-header {
@@ -133,7 +136,7 @@ body {
 
 .login-header h1 {
     font-size: 2rem;
-    color: var(--gold);
+    color: var(--heading);
     margin-bottom: 8px;
 }
 
@@ -172,12 +175,10 @@ body {
 .form-group select:focus {
     outline: none;
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(229, 161, 58, 0.2);
+    box-shadow: 0 0 0 3px rgba(235, 183, 56, 0.25);
 }
 
-/* Calendar icon visibility on dark theme */
 input[type="date"]::-webkit-calendar-picker-indicator {
-    filter: invert(0.8);
     cursor: pointer;
 }
 
@@ -211,7 +212,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .form-section h4 {
     margin-bottom: 10px;
-    color: var(--primary-light);
+    color: var(--heading);
     font-size: 0.95rem;
 }
 
@@ -243,7 +244,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .checkbox-label input:checked + span,
 .radio-label input:checked + span {
-    color: var(--gold);
+    color: var(--heading);
     font-weight: bold;
 }
 
@@ -254,7 +255,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .form-summary {
-    background: rgba(229, 161, 58, 0.15);
+    background: rgba(235, 183, 56, 0.15);
     border: 1px solid var(--primary);
     border-radius: 8px;
     padding: 16px;
@@ -262,7 +263,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .form-summary h4 {
-    color: var(--primary-light);
+    color: var(--heading);
     margin-bottom: 8px;
 }
 
@@ -323,13 +324,13 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: 10px;
-    padding: 20px;
+    padding: 24px;
     margin-bottom: 20px;
 }
 
 .card h3 {
     margin-bottom: 16px;
-    color: var(--gold);
+    color: var(--heading);
 }
 
 .card-header {
@@ -354,12 +355,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .form-card h3 {
     margin-bottom: 20px;
-    color: var(--gold);
+    color: var(--heading);
 }
 
 /* === Level Display === */
 .level-card {
-    background: linear-gradient(135deg, var(--bg-card) 0%, rgba(229, 161, 58, 0.15) 100%);
+    background: linear-gradient(135deg, var(--bg-card) 0%, rgba(235, 183, 56, 0.18) 100%);
     border: 2px solid var(--primary);
     border-radius: 12px;
     padding: 24px;
@@ -377,20 +378,20 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .level-badge {
     display: inline-block;
-    background: linear-gradient(135deg, var(--gold), #f0c000);
-    color: #1a1a2e;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: var(--heading);
     padding: 8px 20px;
     border-radius: 20px;
     font-size: 1.5rem;
     font-weight: 900;
     letter-spacing: 1px;
-    box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+    box-shadow: 0 2px 10px rgba(222, 158, 30, 0.35);
 }
 
 .level-badge-small {
     display: inline-block;
-    background: linear-gradient(135deg, var(--gold), #f0c000);
-    color: #1a1a2e;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: var(--heading);
     padding: 2px 10px;
     border-radius: 12px;
     font-size: 0.85rem;
@@ -414,7 +415,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .xp-bar {
     height: 100%;
-    background: linear-gradient(90deg, var(--primary), var(--primary-light), var(--gold));
+    background: linear-gradient(90deg, var(--primary-dark), var(--primary), var(--primary-light));
     border-radius: 12px;
     transition: width 0.8s ease;
     position: relative;
@@ -430,7 +431,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     background: linear-gradient(
         90deg,
         transparent 0%,
-        rgba(255, 255, 255, 0.15) 50%,
+        rgba(255, 255, 255, 0.35) 50%,
         transparent 100%
     );
     animation: shimmer 2s infinite;
@@ -445,7 +446,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     margin-top: 8px;
     font-size: 1.1rem;
     font-weight: bold;
-    color: var(--primary-light);
+    color: var(--heading);
 }
 
 /* === Tables === */
@@ -453,13 +454,13 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: 10px;
-    padding: 20px;
+    padding: 24px;
     overflow-x: auto;
 }
 
 .table-container h3 {
     margin-bottom: 16px;
-    color: var(--gold);
+    color: var(--heading);
 }
 
 .xp-table {
@@ -470,32 +471,33 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .xp-table th {
     background: var(--bg-card-lighter);
-    padding: 10px 12px;
+    padding: 12px 14px;
     text-align: center;
     font-weight: 700;
-    color: var(--primary-light);
+    color: var(--heading);
     border-bottom: 2px solid var(--primary);
     white-space: nowrap;
 }
 
 .xp-table td {
-    padding: 8px 12px;
+    padding: 10px 14px;
     text-align: center;
     border-bottom: 1px solid var(--border);
+    white-space: nowrap;
 }
 
 .xp-table tr:hover {
-    background: rgba(229, 161, 58, 0.05);
+    background: rgba(235, 183, 56, 0.08);
 }
 
 .xp-table td a {
-    color: var(--primary-light);
+    color: var(--heading);
     text-decoration: none;
     font-weight: 600;
 }
 
 .xp-table td a:hover {
-    color: var(--gold);
+    color: var(--primary-dark);
     text-decoration: underline;
 }
 
@@ -521,21 +523,21 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .badge-approved {
-    background: rgba(0, 184, 148, 0.2);
+    background: rgba(31, 138, 76, 0.15);
     color: var(--success);
     border: 1px solid var(--success);
 }
 
 .badge-pending {
-    background: rgba(253, 203, 110, 0.15);
+    background: rgba(156, 107, 11, 0.15);
     color: var(--warning);
     border: 1px solid var(--warning);
 }
 
 .badge-admin {
-    background: rgba(214, 48, 49, 0.2);
-    color: #ff6b6b;
-    border: 1px solid #ff6b6b;
+    background: rgba(192, 57, 43, 0.15);
+    color: var(--danger);
+    border: 1px solid var(--danger);
     font-size: 0.7rem;
 }
 
@@ -566,13 +568,13 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .approval-header strong {
-    color: var(--primary-light);
+    color: var(--heading);
     font-size: 1rem;
 }
 
 .approval-total {
     font-weight: 700;
-    color: var(--gold);
+    color: var(--heading);
 }
 
 .approval-items {
@@ -584,12 +586,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .xp-chip {
     display: inline-block;
-    background: rgba(229, 161, 58, 0.15);
+    background: rgba(235, 183, 56, 0.18);
     border: 1px solid var(--primary);
     padding: 4px 10px;
     border-radius: 14px;
     font-size: 0.82rem;
-    color: var(--primary-light);
+    color: var(--text);
 }
 
 .approval-actions {
@@ -627,13 +629,13 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .modal h3 {
-    color: var(--gold);
+    color: var(--heading);
     margin-bottom: 16px;
 }
 
 .modal-total {
     font-size: 1.2rem;
-    color: var(--gold);
+    color: var(--heading);
     margin: 12px 0;
 }
 
@@ -667,7 +669,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .notification-bell:hover {
-    color: var(--gold);
+    color: var(--heading);
 }
 
 .notification-bell .notif-badge {
@@ -695,7 +697,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     background: var(--bg-card);
     border: 1px solid var(--primary);
     border-radius: 10px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 8px 24px rgba(61, 48, 25, 0.18);
     z-index: 999;
     margin-top: 8px;
 }
@@ -708,7 +710,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     padding: 12px 16px;
     border-bottom: 1px solid var(--border);
     font-weight: 700;
-    color: var(--gold);
+    color: var(--heading);
     font-size: 0.9rem;
 }
 
@@ -734,7 +736,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .notif-item.unread {
-    background: rgba(229, 161, 58, 0.1);
+    background: rgba(235, 183, 56, 0.12);
 }
 
 .notif-item .notif-content {
@@ -758,8 +760,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .notif-item .notif-read-btn {
     background: none;
-    border: 1px solid var(--primary);
-    color: var(--primary-light);
+    border: 1px solid var(--primary-dark);
+    color: var(--heading);
     font-size: 0.72rem;
     padding: 2px 8px;
     border-radius: 4px;
@@ -770,7 +772,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .notif-item .notif-read-btn:hover {
     background: var(--primary);
-    color: white;
+    color: var(--heading);
 }
 
 .notification-wrapper {
@@ -817,29 +819,30 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 /* === Penalty === */
-.penalty-row { background: rgba(214, 48, 49, 0.08); }
-.penalty-row:hover { background: rgba(214, 48, 49, 0.12); }
-.penalty-label { color: #ff6b6b; font-style: italic; }
+.penalty-row { background: rgba(192, 57, 43, 0.08); }
+.penalty-row:hover { background: rgba(192, 57, 43, 0.12); }
+.penalty-label { color: var(--danger); font-style: italic; }
 .penalty-xp { color: var(--danger); font-weight: 700; }
-.badge-danger { background: rgba(214, 48, 49, 0.2); color: #ff6b6b; border: 1px solid #ff6b6b; }
+.badge-danger { background: rgba(192, 57, 43, 0.15); color: var(--danger); border: 1px solid var(--danger); }
 
 /* === Admin Split View === */
 .admin-split-container {
-    max-width: 1400px;
+    max-width: 1440px;
 }
 
 .split-view {
     display: flex;
     align-items: flex-start;
-    gap: 20px;
+    gap: 24px;
 }
 
 .split-view-list {
-    flex: 0 0 380px;
+    flex: 0 0 460px;
     position: sticky;
     top: 20px;
     max-height: calc(100vh - 40px);
     overflow-y: auto;
+    overflow-x: auto;
 }
 
 .split-view-detail {
@@ -848,11 +851,11 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .student-row-selected {
-    background: rgba(229, 161, 58, 0.14);
+    background: rgba(235, 183, 56, 0.2);
 }
 
 .student-row-selected td a {
-    color: var(--gold);
+    color: var(--heading);
 }
 
 /* === Responsive === */
