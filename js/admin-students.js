@@ -77,6 +77,8 @@ async function loadStudents() {
         const { level, remainder } = calculateLevel(totalXP);
 
         const row = document.createElement('tr');
+        row.dataset.studentId = student.id;
+        if (student.id === selectedStudentId) row.classList.add('student-row-selected');
         row.innerHTML = `
             <td><a href="#" onclick="showStudentDetail('${student.id}', '${student.name}'); return false;">${student.name}</a></td>
             <td><span class="level-badge-small">Lv.${level}</span> ${remainder}%</td>
@@ -84,6 +86,12 @@ async function loadStudents() {
             <td><button class="btn btn-small btn-secondary" onclick="showStudentDetail('${student.id}', '${student.name}')">상세보기</button></td>
         `;
         tbody.appendChild(row);
+    });
+}
+
+function highlightSelectedStudentRow(studentId) {
+    document.querySelectorAll('#students-body tr').forEach(row => {
+        row.classList.toggle('student-row-selected', row.dataset.studentId === studentId);
     });
 }
 
@@ -111,7 +119,9 @@ async function showStudentDetail(studentId, studentName) {
     selectedStudentId = studentId;
     selectedStudentName = studentName;
     document.getElementById('detail-student-name').textContent = studentName;
+    document.getElementById('student-detail-placeholder').style.display = 'none';
     document.getElementById('student-detail').style.display = 'block';
+    highlightSelectedStudentRow(studentId);
 
     // Reset penalty section and add-entry form when switching students
     hidePenaltySection();
@@ -145,6 +155,8 @@ async function showStudentDetail(studentId, studentName) {
 
 function hideStudentDetail() {
     document.getElementById('student-detail').style.display = 'none';
+    document.getElementById('student-detail-placeholder').style.display = 'block';
+    highlightSelectedStudentRow(null);
     selectedStudentId = null;
     selectedStudentName = null;
 }
@@ -265,7 +277,8 @@ async function loadStudentEntries(studentId, studentName) {
                 : '<span class="badge badge-pending">대기중</span>'}</td>`;
 
             row.innerHTML = cells;
-            tbody.appendChild(row);
+            // Newest entries first, while cumulative XP is still computed oldest-to-newest above
+            tbody.insertBefore(row, tbody.firstChild);
         } else {
             const p = item.data;
             const row = document.createElement('tr');
@@ -283,7 +296,7 @@ async function loadStudentEntries(studentId, studentName) {
             cells += `<td><span class="badge badge-danger">감점</span></td>`;
 
             row.innerHTML = cells;
-            tbody.appendChild(row);
+            tbody.insertBefore(row, tbody.firstChild);
         }
     });
 

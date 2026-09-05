@@ -28,117 +28,126 @@
         </div>
     </nav>
 
-    <main class="container">
-        <!-- Students Overview -->
-        <div class="card">
-            <div class="card-header">
-                <h3>👨‍🎓 학생 목록</h3>
-                <button class="btn btn-small btn-secondary" onclick="syncAllXP()">XP 동기화</button>
-            </div>
-            <table class="xp-table">
-                <thead>
-                    <tr>
-                        <th>이름</th>
-                        <th>레벨</th>
-                        <th>누적 경험치</th>
-                        <th>관리</th>
-                    </tr>
-                </thead>
-                <tbody id="students-body"></tbody>
-            </table>
-        </div>
-
-        <!-- Student Detail View (hidden by default) -->
-        <div class="card" id="student-detail" style="display:none;">
-            <div class="card-header">
-                <h3>📖 <span id="detail-student-name"></span>의 경험치 기록</h3>
-                <button class="btn btn-small btn-secondary" onclick="hideStudentDetail()">닫기</button>
-            </div>
-            <div class="card-header" style="margin-top:8px;">
-                <div class="level-info-inline">
-                    <span class="level-badge" id="detail-level-badge">Lv.1</span>
-                    <span id="detail-xp-text">0%</span>
+    <main class="container admin-split-container">
+        <div class="split-view">
+            <!-- Students Overview -->
+            <div class="split-view-list card">
+                <div class="card-header">
+                    <h3>👨‍🎓 학생 목록</h3>
+                    <button class="btn btn-small btn-secondary" onclick="syncAllXP()">XP 동기화</button>
                 </div>
-                <div style="display:flex;gap:8px;">
-                    <button class="btn btn-small btn-primary" onclick="showAddEntryForm()">+ 경험치 추가</button>
-                    <button class="btn btn-small btn-danger" onclick="showPenaltySection()">⚠️ 감점</button>
-                </div>
+                <table class="xp-table">
+                    <thead>
+                        <tr>
+                            <th>이름</th>
+                            <th>레벨</th>
+                            <th>누적 경험치</th>
+                            <th>관리</th>
+                        </tr>
+                    </thead>
+                    <tbody id="students-body"></tbody>
+                </table>
             </div>
 
-            <!-- Admin Add Entry Form -->
-            <div id="admin-add-entry" class="inline-form" style="display:none;">
-                <h4>경험치 직접 추가 (바로 승인됨)</h4>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>날짜</label>
-                        <input type="date" id="admin-entry-date">
+            <div class="split-view-detail">
+                <!-- Placeholder shown until a student is selected -->
+                <div class="card" id="student-detail-placeholder">
+                    <p class="text-center text-muted" style="padding:60px 0;font-size:1rem;">👈 학생을 선택하면 경험치 기록이 여기에 표시됩니다.</p>
+                </div>
+
+                <!-- Student Detail View (hidden by default) -->
+                <div class="card" id="student-detail" style="display:none;">
+                    <div class="card-header">
+                        <h3>📖 <span id="detail-student-name"></span>의 경험치 기록</h3>
+                        <button class="btn btn-small btn-secondary" onclick="hideStudentDetail()">닫기</button>
                     </div>
-                    <div class="form-group">
-                        <label>인사</label>
-                        <label class="checkbox-label"><input type="checkbox" id="admin-greetings"><span>3%</span></label>
-                    </div>
-                    <div class="form-group">
-                        <label>과제 개수</label>
-                        <input type="number" id="admin-assignments" min="0" max="20" value="0" class="input-small">
-                    </div>
-                    <div class="form-group">
-                        <label>글쓰기</label>
-                        <select id="admin-writing">
-                            <option value="none">없음</option>
-                            <option value="5%">감사 일기 (5%)</option>
-                            <option value="10%">주제 글쓰기 (10%)</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>보너스</label>
-                        <div style="display:flex;gap:8px;align-items:center;">
-                            <input type="number" id="admin-bonus-points" min="0" value="0" class="input-small">
-                            <span>%</span>
-                            <input type="text" id="admin-bonus-reason" placeholder="보너스 사유" class="input-inline">
+                    <div class="card-header" style="margin-top:8px;">
+                        <div class="level-info-inline">
+                            <span class="level-badge" id="detail-level-badge">Lv.1</span>
+                            <span id="detail-xp-text">0%</span>
+                        </div>
+                        <div style="display:flex;gap:8px;">
+                            <button class="btn btn-small btn-primary" onclick="showAddEntryForm()">+ 경험치 추가</button>
+                            <button class="btn btn-small btn-danger" onclick="showPenaltySection()">⚠️ 감점</button>
                         </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label>가치 도장</label>
-                    <div id="admin-value-stamps"></div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>칭호 (각 20%)</label>
-                        <div id="admin-title-inputs">
-                            <div class="title-row" style="margin-bottom: 6px;">
-                                <input type="text" name="admin-title-name" placeholder="칭호 이름 (없으면 비워두세요)" class="input-inline">
+
+                    <!-- Admin Add Entry Form -->
+                    <div id="admin-add-entry" class="inline-form" style="display:none;">
+                        <h4>경험치 직접 추가 (바로 승인됨)</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>날짜</label>
+                                <input type="date" id="admin-entry-date">
+                            </div>
+                            <div class="form-group">
+                                <label>인사</label>
+                                <label class="checkbox-label"><input type="checkbox" id="admin-greetings"><span>3%</span></label>
+                            </div>
+                            <div class="form-group">
+                                <label>과제 개수</label>
+                                <input type="number" id="admin-assignments" min="0" max="20" value="0" class="input-small">
+                            </div>
+                            <div class="form-group">
+                                <label>글쓰기</label>
+                                <select id="admin-writing">
+                                    <option value="none">없음</option>
+                                    <option value="5%">감사 일기 (5%)</option>
+                                    <option value="10%">주제 글쓰기 (10%)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>보너스</label>
+                                <div style="display:flex;gap:8px;align-items:center;">
+                                    <input type="number" id="admin-bonus-points" min="0" value="0" class="input-small">
+                                    <span>%</span>
+                                    <input type="text" id="admin-bonus-reason" placeholder="보너스 사유" class="input-inline">
+                                </div>
                             </div>
                         </div>
-                        <button type="button" class="btn btn-small btn-secondary" onclick="addAdminTitleInput()" style="margin-top: 6px;">+ 칭호 추가</button>
+                        <div class="form-group">
+                            <label>가치 도장</label>
+                            <div id="admin-value-stamps"></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>칭호 (각 20%)</label>
+                                <div id="admin-title-inputs">
+                                    <div class="title-row" style="margin-bottom: 6px;">
+                                        <input type="text" name="admin-title-name" placeholder="칭호 이름 (없으면 비워두세요)" class="input-inline">
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-small btn-secondary" onclick="addAdminTitleInput()" style="margin-top: 6px;">+ 칭호 추가</button>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button id="admin-entry-submit-btn" class="btn btn-primary" onclick="submitAdminEntry()">추가</button>
+                            <button class="btn btn-secondary" onclick="hideAddEntryForm()">취소</button>
+                        </div>
+                    </div>
+
+                    <!-- Multi-Penalty Application Form -->
+                    <div id="penalty-section" class="inline-form" style="display:none;flex-direction:column;align-items:stretch;">
+                        <h4 style="color:#ff6b6b;">⚠️ 감점 적용</h4>
+                        <div id="penalty-rows"></div>
+                        <button class="btn btn-small btn-secondary" onclick="addPenaltyRow()" style="align-self:flex-start;">+ 감점 추가</button>
+                        <div id="penalty-preview" class="form-summary" style="display:none;">
+                            <h4>예상 감점</h4>
+                            <p id="penalty-preview-text"></p>
+                        </div>
+                        <div class="form-actions">
+                            <button id="apply-penalty-btn" class="btn btn-danger" onclick="applyPenalties()">감점 적용</button>
+                            <button class="btn btn-secondary" onclick="hidePenaltySection()">취소</button>
+                        </div>
+                    </div>
+
+                    <div style="overflow-x:auto;">
+                        <table class="xp-table" id="detail-table">
+                            <thead id="detail-table-head"></thead>
+                            <tbody id="detail-table-body"></tbody>
+                        </table>
                     </div>
                 </div>
-                <div class="form-actions">
-                    <button id="admin-entry-submit-btn" class="btn btn-primary" onclick="submitAdminEntry()">추가</button>
-                    <button class="btn btn-secondary" onclick="hideAddEntryForm()">취소</button>
-                </div>
-            </div>
-
-            <!-- Multi-Penalty Application Form -->
-            <div id="penalty-section" class="inline-form" style="display:none;flex-direction:column;align-items:stretch;">
-                <h4 style="color:#ff6b6b;">⚠️ 감점 적용</h4>
-                <div id="penalty-rows"></div>
-                <button class="btn btn-small btn-secondary" onclick="addPenaltyRow()" style="align-self:flex-start;">+ 감점 추가</button>
-                <div id="penalty-preview" class="form-summary" style="display:none;">
-                    <h4>예상 감점</h4>
-                    <p id="penalty-preview-text"></p>
-                </div>
-                <div class="form-actions">
-                    <button id="apply-penalty-btn" class="btn btn-danger" onclick="applyPenalties()">감점 적용</button>
-                    <button class="btn btn-secondary" onclick="hidePenaltySection()">취소</button>
-                </div>
-            </div>
-
-            <div style="overflow-x:auto;">
-                <table class="xp-table" id="detail-table">
-                    <thead id="detail-table-head"></thead>
-                    <tbody id="detail-table-body"></tbody>
-                </table>
             </div>
         </div>
     </main>

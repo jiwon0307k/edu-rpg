@@ -1,9 +1,9 @@
 /* === Edu-RPG: RPG-themed CSS === */
 
 :root {
-    --primary: #6c5ce7;
-    --primary-dark: #5a4bd1;
-    --primary-light: #a29bfe;
+    --primary: #e5a13a;
+    --primary-dark: #c98527;
+    --primary-light: #f5c873;
     --secondary: #636e72;
     --success: #00b894;
     --danger: #d63031;
@@ -74,7 +74,7 @@ body {
 
 .btn-primary {
     background: var(--primary);
-    color: white;
+    color: #2b1d00;
 }
 .btn-primary:hover {
     background: var(--primary-dark);
@@ -123,7 +123,7 @@ body {
     padding: 40px;
     width: 100%;
     max-width: 400px;
-    box-shadow: 0 0 30px rgba(108, 92, 231, 0.2);
+    box-shadow: 0 0 30px rgba(229, 161, 58, 0.2);
 }
 
 .login-header {
@@ -172,7 +172,7 @@ body {
 .form-group select:focus {
     outline: none;
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.2);
+    box-shadow: 0 0 0 3px rgba(229, 161, 58, 0.2);
 }
 
 /* Calendar icon visibility on dark theme */
@@ -254,7 +254,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .form-summary {
-    background: rgba(108, 92, 231, 0.15);
+    background: rgba(229, 161, 58, 0.15);
     border: 1px solid var(--primary);
     border-radius: 8px;
     padding: 16px;
@@ -359,7 +359,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 /* === Level Display === */
 .level-card {
-    background: linear-gradient(135deg, var(--bg-card) 0%, rgba(108, 92, 231, 0.15) 100%);
+    background: linear-gradient(135deg, var(--bg-card) 0%, rgba(229, 161, 58, 0.15) 100%);
     border: 2px solid var(--primary);
     border-radius: 12px;
     padding: 24px;
@@ -485,7 +485,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .xp-table tr:hover {
-    background: rgba(108, 92, 231, 0.05);
+    background: rgba(229, 161, 58, 0.05);
 }
 
 .xp-table td a {
@@ -584,7 +584,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .xp-chip {
     display: inline-block;
-    background: rgba(108, 92, 231, 0.15);
+    background: rgba(229, 161, 58, 0.15);
     border: 1px solid var(--primary);
     padding: 4px 10px;
     border-radius: 14px;
@@ -734,7 +734,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .notif-item.unread {
-    background: rgba(108, 92, 231, 0.1);
+    background: rgba(229, 161, 58, 0.1);
 }
 
 .notif-item .notif-content {
@@ -823,6 +823,38 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .penalty-xp { color: var(--danger); font-weight: 700; }
 .badge-danger { background: rgba(214, 48, 49, 0.2); color: #ff6b6b; border: 1px solid #ff6b6b; }
 
+/* === Admin Split View === */
+.admin-split-container {
+    max-width: 1400px;
+}
+
+.split-view {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.split-view-list {
+    flex: 0 0 380px;
+    position: sticky;
+    top: 20px;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+}
+
+.split-view-detail {
+    flex: 1;
+    min-width: 0;
+}
+
+.student-row-selected {
+    background: rgba(229, 161, 58, 0.14);
+}
+
+.student-row-selected td a {
+    color: var(--gold);
+}
+
 /* === Responsive === */
 @media (max-width: 768px) {
     .navbar {
@@ -877,5 +909,23 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         flex-direction: column;
         align-items: flex-start;
         gap: 4px;
+    }
+}
+
+@media (max-width: 1000px) {
+    .split-view {
+        flex-direction: column;
+    }
+
+    .split-view-list {
+        flex: 1 1 auto;
+        width: 100%;
+        position: static;
+        max-height: none;
+        overflow-y: visible;
+    }
+
+    .split-view-detail {
+        width: 100%;
     }
 }

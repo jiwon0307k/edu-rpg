@@ -188,7 +188,8 @@ async function loadProgressTable() {
             }
             row.appendChild(statusCell);
 
-            tbody.appendChild(row);
+            // Newest entries first, while cumulative XP is still computed oldest-to-newest above
+            tbody.insertBefore(row, tbody.firstChild);
         } else {
             // Penalty row
             const p = item.data;
@@ -221,7 +222,7 @@ async function loadProgressTable() {
             statusCell.innerHTML = '<span class="badge badge-danger">감점</span>';
             row.appendChild(statusCell);
 
-            tbody.appendChild(row);
+            tbody.insertBefore(row, tbody.firstChild);
         }
     });
 
