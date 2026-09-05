@@ -137,7 +137,7 @@ async function showStudentDetail(studentId, studentName) {
         <label class="checkbox-label">
             <input type="checkbox" name="admin-vt" value="${vt.id}" data-points="${vt.points}" data-name="${vt.name}"
                 onchange="this.closest('.stamp-count-item').querySelector('.stamp-count').disabled = !this.checked;">
-            <span>${vt.name}</span>
+            <span>${vt.name} (${vt.points}%)</span>
         </label>
         <input type="number" class="stamp-count input-small" min="1" max="20" value="1" disabled data-vt-id="${vt.id}">
     `);
