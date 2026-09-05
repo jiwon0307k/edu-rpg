@@ -10,7 +10,6 @@
     --btn-text: #3E2E1E;
     --btn-hover-bg: #FDEAA8;
 
-    --success: #2F9E5B;
     --danger: #E66760;
     --danger-dark: #D14F48;
     --warning: #9C6B0B;
@@ -162,6 +161,23 @@ body {
     color: var(--text-muted);
 }
 
+#email,
+#password {
+    background: #FFFFFF;
+    border: 1px solid #E2D4BC;
+    height: 46px;
+    padding: 0 14px;
+}
+
+.btn-login {
+    display: block;
+    width: 100%;
+    max-width: 200px;
+    margin: 24px auto 0;
+    text-align: center;
+    color: #261A0C;
+}
+
 /* === Forms === */
 .form-group {
     margin-bottom: 16px;
@@ -223,9 +239,10 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .form-section {
     background: var(--bg-card-lighter);
-    border-radius: 8px;
-    padding: 16px;
-    margin-bottom: 16px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 12px;
 }
 
 .form-section h4 {
@@ -427,16 +444,17 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .xp-bar-container {
     width: 100%;
     height: 24px;
-    background: var(--bg);
-    border-radius: 12px;
+    background: #F2E9D8;
+    border-radius: 999px;
     overflow: hidden;
     border: 1px solid var(--border);
+    box-shadow: inset 0 2px 4px rgba(140, 105, 40, 0.12);
 }
 
 .xp-bar {
     height: 100%;
-    background: linear-gradient(90deg, var(--primary-dark), var(--primary), var(--primary-light));
-    border-radius: 12px;
+    background: linear-gradient(90deg, #E68A00 0%, #F5B738 100%);
+    border-radius: 999px;
     transition: width 0.8s ease;
     position: relative;
 }
@@ -544,9 +562,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .badge-approved {
-    background: rgba(47, 158, 91, 0.15);
-    color: var(--success);
-    border: 1px solid var(--success);
+    background: #FDF1CD;
+    color: #3E2914;
+    border: 1px solid #E8D4A2;
+    border-radius: 999px;
+    padding: 4px 12px;
+    font-weight: 600;
 }
 
 .badge-pending {
@@ -801,16 +822,50 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     position: relative;
 }
 
-/* === Stamp Count Item === */
+/* === Stamp Count Item (value-stamp tag chips) === */
+#value-stamps-container,
+#admin-value-stamps,
+#edit-value-stamps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
 .stamp-count-item {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 6px;
+    gap: 6px;
+    padding: 6px 10px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    transition: background 0.2s, border-color 0.2s;
+    margin-bottom: 0;
+}
+
+.stamp-count-item:has(input[type="checkbox"]:checked) {
+    background: #FDEAA8;
+    border-color: var(--primary);
+}
+
+.stamp-count-item .checkbox-label {
+    background: none;
+    border: none;
+    padding: 0;
+    width: auto;
+    flex: 1;
+    min-width: 0;
+}
+
+.stamp-count-item .checkbox-label span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .stamp-count-item .stamp-count {
-    width: 50px;
+    width: 44px;
+    flex-shrink: 0;
 }
 
 .stamp-count-item .stamp-count:disabled {
@@ -938,6 +993,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         flex-direction: column;
         align-items: flex-start;
         gap: 4px;
+    }
+
+    #value-stamps-container,
+    #admin-value-stamps,
+    #edit-value-stamps {
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 
