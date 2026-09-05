@@ -1,22 +1,34 @@
-/* === Edu-RPG: Warm Butter Yellow Theme === */
+/* === Edu-RPG: Soft Butter & Pure Milk Theme === */
 
 :root {
-    --primary: #EBB738;
-    --primary-dark: #DE9E1E;
-    --primary-light: #F7E6AE;
-    --secondary: #B9A06B;
-    --secondary-dark: #A08A56;
-    --success: #1F8A4C;
-    --danger: #C0392B;
-    --danger-dark: #A93226;
+    --primary: #F5B738;
+    --primary-dark: #E0A020;
+    --primary-light: #FBE4A0;
+
+    --btn-bg: #FFFFFF;
+    --btn-border: #DFCFA7;
+    --btn-text: #3E2E1E;
+    --btn-hover-bg: #FDEAA8;
+
+    --success: #2F9E5B;
+    --danger: #E66760;
+    --danger-dark: #D14F48;
     --warning: #9C6B0B;
-    --bg: #FEFBF3;
-    --bg-card: #FFF3CD;
-    --bg-card-lighter: #FDEEB7;
-    --text: #3D3019;
-    --heading: #2B2111;
+
+    --bg: #FAF3DC;
+    --bg-card: #FFFEFA;
+    --bg-card-lighter: #F9F5EC;
+
+    --text: #3E2E1E;
+    --heading: #2A1B08;
     --text-muted: #8A7A52;
-    --border: #E8D9A0;
+
+    --border: #ECE2CD;
+    --border-table: #F0E7D6;
+
+    --selected-bg: #FFF8DE;
+
+    --card-shadow: 0 6px 20px rgba(140, 105, 40, 0.06);
 }
 
 * {
@@ -25,9 +37,12 @@
     box-sizing: border-box;
 }
 
+html, body, main {
+    background: var(--bg);
+}
+
 body {
     font-family: 'Segoe UI', 'Noto Sans KR', sans-serif;
-    background: var(--bg);
     color: var(--text);
     min-height: 100vh;
 }
@@ -39,7 +54,7 @@ body {
     align-items: center;
     padding: 16px 28px;
     background: var(--bg-card);
-    border-bottom: 2px solid var(--primary);
+    border-bottom: 1px solid var(--border);
     flex-wrap: wrap;
     gap: 12px;
 }
@@ -85,11 +100,14 @@ body {
 }
 
 .btn-secondary {
-    background: var(--secondary);
-    color: var(--heading);
+    background: var(--btn-bg);
+    border: 1px solid var(--btn-border);
+    color: var(--btn-text);
+    font-weight: 500;
 }
 .btn-secondary:hover {
-    background: var(--secondary-dark);
+    background: var(--btn-hover-bg);
+    transform: translateY(-1px);
 }
 
 .btn-danger {
@@ -121,12 +139,12 @@ body {
 
 .login-box {
     background: var(--bg-card);
-    border: 2px solid var(--primary);
-    border-radius: 12px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
     padding: 40px;
     width: 100%;
     max-width: 400px;
-    box-shadow: 0 0 30px rgba(235, 183, 56, 0.25);
+    box-shadow: var(--card-shadow);
 }
 
 .login-header {
@@ -175,7 +193,7 @@ body {
 .form-group select:focus {
     outline: none;
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(235, 183, 56, 0.25);
+    box-shadow: 0 0 0 3px rgba(245, 183, 56, 0.25);
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator {
@@ -255,7 +273,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .form-summary {
-    background: rgba(235, 183, 56, 0.15);
+    background: rgba(245, 183, 56, 0.15);
     border: 1px solid var(--primary);
     border-radius: 8px;
     padding: 16px;
@@ -323,7 +341,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .card {
     background: var(--bg-card);
     border: 1px solid var(--border);
-    border-radius: 10px;
+    border-radius: 14px;
+    box-shadow: var(--card-shadow);
     padding: 24px;
     margin-bottom: 20px;
 }
@@ -347,7 +366,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .form-card {
     background: var(--bg-card);
     border: 1px solid var(--border);
-    border-radius: 10px;
+    border-radius: 14px;
+    box-shadow: var(--card-shadow);
     padding: 24px;
     max-width: 600px;
     margin: 0 auto;
@@ -360,7 +380,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 /* === Level Display === */
 .level-card {
-    background: linear-gradient(135deg, var(--bg-card) 0%, rgba(235, 183, 56, 0.18) 100%);
+    background: linear-gradient(135deg, var(--bg-card) 0%, rgba(245, 183, 56, 0.18) 100%);
     border: 2px solid var(--primary);
     border-radius: 12px;
     padding: 24px;
@@ -385,7 +405,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     font-size: 1.5rem;
     font-weight: 900;
     letter-spacing: 1px;
-    box-shadow: 0 2px 10px rgba(222, 158, 30, 0.35);
+    box-shadow: 0 2px 10px rgba(224, 160, 32, 0.35);
 }
 
 .level-badge-small {
@@ -453,7 +473,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .table-container {
     background: var(--bg-card);
     border: 1px solid var(--border);
-    border-radius: 10px;
+    border-radius: 14px;
+    box-shadow: var(--card-shadow);
     padding: 24px;
     overflow-x: auto;
 }
@@ -474,7 +495,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     padding: 12px 14px;
     text-align: center;
     font-weight: 700;
-    color: var(--heading);
+    color: var(--text);
     border-bottom: 2px solid var(--primary);
     white-space: nowrap;
 }
@@ -482,12 +503,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .xp-table td {
     padding: 10px 14px;
     text-align: center;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--border-table);
     white-space: nowrap;
 }
 
 .xp-table tr:hover {
-    background: rgba(235, 183, 56, 0.08);
+    background: rgba(245, 183, 56, 0.08);
 }
 
 .xp-table td a {
@@ -523,7 +544,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .badge-approved {
-    background: rgba(31, 138, 76, 0.15);
+    background: rgba(47, 158, 91, 0.15);
     color: var(--success);
     border: 1px solid var(--success);
 }
@@ -535,7 +556,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .badge-admin {
-    background: rgba(192, 57, 43, 0.15);
+    background: rgba(230, 103, 96, 0.15);
     color: var(--danger);
     border: 1px solid var(--danger);
     font-size: 0.7rem;
@@ -554,7 +575,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .approval-card {
     background: var(--bg-card-lighter);
     border: 1px solid var(--border);
-    border-radius: 8px;
+    border-radius: 10px;
     padding: 16px;
     margin-bottom: 12px;
     transition: opacity 0.3s;
@@ -586,7 +607,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .xp-chip {
     display: inline-block;
-    background: rgba(235, 183, 56, 0.18);
+    background: rgba(245, 183, 56, 0.18);
     border: 1px solid var(--primary);
     padding: 4px 10px;
     border-radius: 14px;
@@ -606,7 +627,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -616,8 +637,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .modal {
     background: var(--bg-card);
-    border: 2px solid var(--primary);
-    border-radius: 12px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--card-shadow);
     padding: 30px;
     max-width: 80vw;
     width: 100%;
@@ -695,9 +717,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     max-height: 400px;
     overflow-y: auto;
     background: var(--bg-card);
-    border: 1px solid var(--primary);
-    border-radius: 10px;
-    box-shadow: 0 8px 24px rgba(61, 48, 25, 0.18);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--card-shadow);
     z-index: 999;
     margin-top: 8px;
 }
@@ -736,7 +758,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .notif-item.unread {
-    background: rgba(235, 183, 56, 0.12);
+    background: rgba(245, 183, 56, 0.12);
 }
 
 .notif-item .notif-content {
@@ -819,11 +841,11 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 /* === Penalty === */
-.penalty-row { background: rgba(192, 57, 43, 0.08); }
-.penalty-row:hover { background: rgba(192, 57, 43, 0.12); }
+.penalty-row { background: rgba(230, 103, 96, 0.08); }
+.penalty-row:hover { background: rgba(230, 103, 96, 0.12); }
 .penalty-label { color: var(--danger); font-style: italic; }
 .penalty-xp { color: var(--danger); font-weight: 700; }
-.badge-danger { background: rgba(192, 57, 43, 0.15); color: var(--danger); border: 1px solid var(--danger); }
+.badge-danger { background: rgba(230, 103, 96, 0.15); color: var(--danger); border: 1px solid var(--danger); }
 
 /* === Admin Split View === */
 .admin-split-container {
@@ -851,7 +873,11 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .student-row-selected {
-    background: rgba(235, 183, 56, 0.2);
+    background: var(--selected-bg);
+}
+
+.student-row-selected td:first-child {
+    border-left: 4px solid var(--primary);
 }
 
 .student-row-selected td a {
