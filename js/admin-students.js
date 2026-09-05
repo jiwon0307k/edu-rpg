@@ -182,12 +182,13 @@ async function loadStudentEntries(studentId, studentName) {
 
     // Build header
     const thead = document.getElementById('detail-table-head');
-    const colCount = allValueTypes.length + 4;
-    let headerHTML = '<tr><th style="min-width:120px;">날짜</th><th>인사</th>';
-    allValueTypes.forEach(vt => {
+    const orderedValueTypes = orderValueTypesForDisplay(allValueTypes);
+    const midCols = allValueTypes.length + 5; // insa + stamps + assignments + writing + titles + bonus
+    let headerHTML = '<tr><th style="min-width:120px;">날짜</th><th>총 경험치</th><th>상태</th><th>인사</th>';
+    orderedValueTypes.forEach(vt => {
         headerHTML += `<th${!vt.active ? ' class="inactive-col"' : ''}>${vt.name}</th>`;
     });
-    headerHTML += '<th>과제</th><th>글쓰기</th><th style="min-width:120px;">칭호</th><th style="min-width:120px;">보너스</th><th>총 경험치</th><th>누적 경험치</th><th>상태</th></tr>';
+    headerHTML += '<th>과제</th><th>글쓰기</th><th style="min-width:120px;">칭호</th><th style="min-width:120px;">보너스</th><th>총 경험치</th><th>누적 경험치</th></tr>';
     thead.innerHTML = headerHTML;
 
     const tbody = document.getElementById('detail-table-body');
@@ -197,7 +198,7 @@ async function loadStudentEntries(studentId, studentName) {
     const hasPenalties = penalties && penalties.length > 0;
 
     if (!hasEntries && !hasPenalties) {
-        tbody.innerHTML = '<tr><td colspan="20" class="text-center text-muted">기록이 없습니다.</td></tr>';
+        tbody.innerHTML = `<tr><td colspan="${midCols + 5}" class="text-center text-muted">기록이 없습니다.</td></tr>`;
         document.getElementById('detail-level-badge').textContent = 'Lv.1';
         document.getElementById('detail-xp-text').textContent = '0%';
         return;
@@ -224,51 +225,60 @@ async function loadStudentEntries(studentId, studentName) {
             const row = document.createElement('tr');
             if (entry.status === 'pending') row.classList.add('pending-row');
 
-            let dailyXP = 0;
-            let cells = `<td>${entry.date}</td>`;
-
-            if (entry.greetings) { cells += '<td>3%</td>'; dailyXP += 3; }
-            else { cells += '<td>-</td>'; }
-
             const entryStamps = (stamps || []).filter(s => s.entry_id === entry.id);
-            allValueTypes.forEach(vt => {
+            const entryTitles = (titles || []).filter(t => t.entry_id === entry.id);
+
+            // Compute the day's total XP first so it can be shown up front
+            let dailyXP = 0;
+            if (entry.greetings) dailyXP += 3;
+            orderedValueTypes.forEach(vt => {
+                const stamp = entryStamps.find(s => s.value_type_id === vt.id);
+                if (stamp) dailyXP += stamp.points * (stamp.count || 1);
+            });
+            if (entry.assignments > 0) dailyXP += entry.assignments * 5;
+            if (entry.writing_type === '5%') dailyXP += 5;
+            else if (entry.writing_type === '10%') dailyXP += 10;
+            if (entryTitles.length > 0) dailyXP += entryTitles.length * 20;
+            if (entry.bonus_points > 0) dailyXP += entry.bonus_points;
+
+            if (entry.status === 'approved') cumulativeXP += dailyXP;
+
+            let cells = `<td>${entry.date}</td>`;
+            cells += `<td>${dailyXP}%</td>`;
+            cells += `<td>${entry.status === 'approved'
+                ? '<span class="badge badge-approved">승인</span>'
+                : '<span class="badge badge-pending">대기중</span>'}</td>`;
+
+            cells += entry.greetings ? '<td>3%</td>' : '<td>-</td>';
+
+            orderedValueTypes.forEach(vt => {
                 const stamp = entryStamps.find(s => s.value_type_id === vt.id);
                 if (stamp) {
                     const count = stamp.count || 1;
                     const stampXP = stamp.points * count;
                     cells += `<td>${count > 1 ? stampXP + '% (x' + count + ')' : stamp.points + '%'}</td>`;
-                    dailyXP += stampXP;
                 }
                 else { cells += '<td>-</td>'; }
             });
 
             if (entry.assignments > 0) {
-                const assignXP = entry.assignments * 5;
-                cells += `<td>${entry.assignments}개 (${assignXP}%)</td>`;
-                dailyXP += assignXP;
+                cells += `<td>${entry.assignments}개 (${entry.assignments * 5}%)</td>`;
             } else { cells += '<td>-</td>'; }
 
-            if (entry.writing_type === '5%') { cells += '<td>5%</td>'; dailyXP += 5; }
-            else if (entry.writing_type === '10%') { cells += '<td>10%</td>'; dailyXP += 10; }
+            if (entry.writing_type === '5%') { cells += '<td>5%</td>'; }
+            else if (entry.writing_type === '10%') { cells += '<td>10%</td>'; }
             else { cells += '<td>-</td>'; }
 
-            const entryTitles = (titles || []).filter(t => t.entry_id === entry.id);
             if (entryTitles.length > 0) {
                 cells += `<td>${entryTitles.map(t => t.title_name).join(', ')} (${entryTitles.length * 20}%)</td>`;
-                dailyXP += entryTitles.length * 20;
             } else { cells += '<td>-</td>'; }
 
             if (entry.bonus_points > 0) {
                 cells += `<td>${entry.bonus_points}%${entry.bonus_reason ? ' (' + entry.bonus_reason + ')' : ''}</td>`;
-                dailyXP += entry.bonus_points;
             } else { cells += '<td>-</td>'; }
 
             cells += `<td>${dailyXP}%</td>`;
-            if (entry.status === 'approved') cumulativeXP += dailyXP;
             cells += `<td>${cumulativeXP}%</td>`;
-            cells += `<td>${entry.status === 'approved'
-                ? '<span class="badge badge-approved">승인</span>'
-                : '<span class="badge badge-pending">대기중</span>'}</td>`;
 
             row.innerHTML = cells;
             // Newest entries first, while cumulative XP is still computed oldest-to-newest above
@@ -278,16 +288,18 @@ async function loadStudentEntries(studentId, studentName) {
             const row = document.createElement('tr');
             row.classList.add('penalty-row');
 
-            const midCols = allValueTypes.length + 5;
             const noteText = p.note ? ` (${p.note})` : '';
             const countText = (p.count || 1) > 1 ? ` x${p.count}` : '';
+
             let cells = `<td>${p.date}</td>`;
-            cells += `<td colspan="${midCols}" class="penalty-label">🚨 ${p.penalty_type_name}${countText}${noteText}</td>`;
             cells += `<td class="penalty-xp">-${p.xp_deducted}%</td>`;
+            cells += `<td><span class="badge badge-danger">감점</span></td>`;
+            cells += `<td colspan="${midCols}" class="penalty-label">🚨 ${p.penalty_type_name}${countText}${noteText}</td>`;
+
             cumulativeXP -= p.xp_deducted;
             if (cumulativeXP < 0) cumulativeXP = 0;
+            cells += `<td>-</td>`;
             cells += `<td>${cumulativeXP}%</td>`;
-            cells += `<td><span class="badge badge-danger">감점</span></td>`;
 
             row.innerHTML = cells;
             tbody.insertBefore(row, tbody.firstChild);

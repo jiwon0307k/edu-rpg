@@ -20,6 +20,28 @@ function groupValueTypesByCategory(valueTypes) {
     return [life, study, other];
 }
 
+// Returns `valueTypes` reordered to the canonical life-then-study display order
+// (used for table columns), falling back to original order for any unmatched names.
+function orderValueTypesForDisplay(valueTypes) {
+    const byName = new Map(valueTypes.map(vt => [vt.name, vt]));
+    const used = new Set();
+    const ordered = [];
+
+    [...STAMP_GROUP_LIFE, ...STAMP_GROUP_STUDY].forEach(name => {
+        const vt = byName.get(name);
+        if (vt) {
+            ordered.push(vt);
+            used.add(vt.id);
+        }
+    });
+
+    valueTypes.forEach(vt => {
+        if (!used.has(vt.id)) ordered.push(vt);
+    });
+
+    return ordered;
+}
+
 // Renders `valueTypes` into `container` as one 3-column grid of tag chips.
 // `buildItemHTML(vt)` returns the innerHTML for a single .stamp-count-item chip.
 function renderStampGroups(container, valueTypes, buildItemHTML) {
