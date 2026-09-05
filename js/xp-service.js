@@ -97,10 +97,12 @@ async function recalculateAndSaveXP(studentId) {
 
     if (entries && entries.length > 0) {
         entries.forEach(e => {
-            if (e.greetings) totalXP += 3;
-            if (e.assignments > 0) totalXP += e.assignments * 5;
-            if (e.writing_type === '5%') totalXP += 5;
-            if (e.writing_type === '10%') totalXP += 10;
+            // Titles, bonus, and penalties are never doubled - only these four
+            const mult = e.is_double_day ? 2 : 1;
+            if (e.greetings) totalXP += 3 * mult;
+            if (e.assignments > 0) totalXP += e.assignments * 5 * mult;
+            if (e.writing_type === '5%') totalXP += 5 * mult;
+            if (e.writing_type === '10%') totalXP += 10 * mult;
             if (e.bonus_points) totalXP += e.bonus_points;
         });
 

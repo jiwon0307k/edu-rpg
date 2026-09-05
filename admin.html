@@ -29,6 +29,18 @@
     </nav>
 
     <main class="container">
+        <!-- 2x XP Day Event Mode -->
+        <div class="card" id="double-day-card">
+            <div class="card-header">
+                <h3>🔥 2배 Day 이벤트 모드</h3>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="double-day-toggle" onchange="onDoubleDayToggle(this.checked)">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+            <p class="text-muted" id="double-day-status" style="margin-left:0;">불러오는 중...</p>
+        </div>
+
         <!-- Value Type Management -->
         <div class="card">
             <div class="card-header">
@@ -103,6 +115,7 @@
     <script src="js/auth.js"></script>
     <script src="js/notifications.js"></script>
     <script src="js/date-util.js"></script>
+    <script src="js/double-day.js"></script>
     <script src="js/admin.js"></script>
 </body>
 </html>

@@ -655,6 +655,64 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     font-size: 0.7rem;
 }
 
+.badge-double-day {
+    background: rgba(245, 183, 56, 0.25);
+    color: var(--heading);
+    border: 1px solid var(--primary);
+    font-size: 0.7rem;
+    vertical-align: middle;
+}
+
+/* === Toggle Switch === */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 52px;
+    height: 28px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    inset: 0;
+    background: var(--border);
+    border-radius: 999px;
+    transition: background 0.2s;
+}
+
+.toggle-slider::before {
+    content: '';
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    left: 3px;
+    top: 3px;
+    background: #FFFFFF;
+    border-radius: 50%;
+    transition: transform 0.2s;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-switch input:checked + .toggle-slider {
+    background: linear-gradient(90deg, #E68A00, #F5B738);
+}
+
+.toggle-switch input:checked + .toggle-slider::before {
+    transform: translateX(24px);
+}
+
+.toggle-switch input:disabled + .toggle-slider {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
 .count-badge {
     background: var(--danger);
     color: white;

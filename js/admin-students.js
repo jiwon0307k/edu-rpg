@@ -5,16 +5,34 @@ let allValueTypes = [];
 let allPenaltyTypes = [];
 let selectedStudentId = null;
 let selectedStudentName = null;
+let isDoubleDay = false;
 
 (async () => {
     currentProfile = await requireAuth(['admin']);
     if (!currentProfile) return;
 
     await loadPendingCount();
+    await initDoubleDayBadge();
     await loadValueTypes();
     await loadPenaltyTypes();
     await loadStudents();
 })();
+
+// --- 2x XP Day ---
+async function initDoubleDayBadge() {
+    isDoubleDay = await getDoubleXPDayActive();
+    document.getElementById('double-day-badge').style.display = isDoubleDay ? 'inline-block' : 'none';
+}
+
+function applyAdminDoubleDayLabels() {
+    const mult = xpMultiplier(isDoubleDay);
+    const fire = isDoubleDay ? ' 🔥' : '';
+    document.getElementById('admin-insa-title').textContent = `인사 (${3 * mult}%${fire})`;
+    document.getElementById('admin-stamp-title').textContent = `가치 도장 (각 ${5 * mult}%${fire})`;
+    document.getElementById('admin-assignment-title').textContent = `과제 개수 (각 ${5 * mult}%${fire})`;
+    document.getElementById('admin-writing-5-option').textContent = `감사 일기 (${5 * mult}%${fire})`;
+    document.getElementById('admin-writing-10-option').textContent = `주제 글쓰기 (${10 * mult}%${fire})`;
+}
 
 // --- Pending Count ---
 async function loadPendingCount() {
@@ -131,13 +149,19 @@ async function showStudentDetail(studentId, studentName) {
     // Set default date for admin entry form
     document.getElementById('admin-entry-date').value = getTodayISO();
 
+    // Refresh 2x day state in case it changed since page load, then update labels
+    isDoubleDay = await getDoubleXPDayActive();
+    document.getElementById('double-day-badge').style.display = isDoubleDay ? 'inline-block' : 'none';
+    applyAdminDoubleDayLabels();
+    const mult = xpMultiplier(isDoubleDay);
+
     // Load admin value stamp checkboxes with count inputs
     const container = document.getElementById('admin-value-stamps');
     renderStampGroups(container, allValueTypes.filter(vt => vt.active), vt => `
         <label class="checkbox-label">
-            <input type="checkbox" name="admin-vt" value="${vt.id}" data-points="${vt.points}" data-name="${vt.name}"
+            <input type="checkbox" name="admin-vt" value="${vt.id}" data-points="${vt.points * mult}" data-name="${vt.name}"
                 onchange="this.closest('.stamp-count-item').querySelector('.stamp-count').disabled = !this.checked;">
-            <span>${vt.name} (${vt.points}%)</span>
+            <span>${vt.name}</span>
         </label>
         <input type="number" class="stamp-count input-small" min="1" max="20" value="1" disabled data-vt-id="${vt.id}">
     `);
@@ -229,15 +253,17 @@ async function loadStudentEntries(studentId, studentName) {
             const entryTitles = (titles || []).filter(t => t.entry_id === entry.id);
 
             // Compute the day's total XP first so it can be shown up front
+            // (titles, bonus, and penalties are never doubled)
+            const mult = entry.is_double_day ? 2 : 1;
             let dailyXP = 0;
-            if (entry.greetings) dailyXP += 3;
+            if (entry.greetings) dailyXP += 3 * mult;
             orderedValueTypes.forEach(vt => {
                 const stamp = entryStamps.find(s => s.value_type_id === vt.id);
                 if (stamp) dailyXP += stamp.points * (stamp.count || 1);
             });
-            if (entry.assignments > 0) dailyXP += entry.assignments * 5;
-            if (entry.writing_type === '5%') dailyXP += 5;
-            else if (entry.writing_type === '10%') dailyXP += 10;
+            if (entry.assignments > 0) dailyXP += entry.assignments * 5 * mult;
+            if (entry.writing_type === '5%') dailyXP += 5 * mult;
+            else if (entry.writing_type === '10%') dailyXP += 10 * mult;
             if (entryTitles.length > 0) dailyXP += entryTitles.length * 20;
             if (entry.bonus_points > 0) dailyXP += entry.bonus_points;
 
@@ -388,6 +414,7 @@ async function doSubmitAdminEntry() {
             bonus_points: bonusPoints,
             bonus_reason: bonusReason,
             status: 'approved',
+            is_double_day: isDoubleDay,
             modified_at: getNowKST(),
             modified_by: currentProfile.id
         })

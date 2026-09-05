@@ -272,6 +272,28 @@ INSERT INTO penalty_types (name, percent, is_reset, is_rate, rate_unit, rate_uni
 -- ALTER TABLE daily_entries ADD COLUMN bonus_points INTEGER NOT NULL DEFAULT 0;
 -- ALTER TABLE daily_entries ADD COLUMN bonus_reason TEXT DEFAULT '';
 
+-- 1g. 2x XP Day event mode -- RUN THIS NOW (not yet applied)
+-- Global on/off toggle (app_settings) + a per-entry snapshot flag on
+-- daily_entries so an entry keeps whatever multiplier applied when it was
+-- submitted, even if the toggle is switched later.
+CREATE TABLE IF NOT EXISTS app_settings (
+    key TEXT PRIMARY KEY,
+    value BOOLEAN NOT NULL DEFAULT false,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_by UUID REFERENCES profiles(id)
+);
+
+INSERT INTO app_settings (key, value)
+VALUES ('double_xp_day', false)
+ON CONFLICT (key) DO NOTHING;
+
+ALTER TABLE app_settings ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "app_settings_select" ON app_settings FOR SELECT USING (true);
+CREATE POLICY "app_settings_update" ON app_settings FOR UPDATE USING (is_admin());
+
+ALTER TABLE daily_entries ADD COLUMN IF NOT EXISTS is_double_day BOOLEAN NOT NULL DEFAULT false;
+
 -- ============================================
 -- SETUP INSTRUCTIONS
 -- ============================================

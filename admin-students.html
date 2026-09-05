@@ -10,7 +10,7 @@
 <body>
     <nav class="navbar">
         <div class="nav-left">
-            <h2>🌼 경험치 통장 <span class="badge badge-admin">관리자</span></h2>
+            <h2>🌼 경험치 통장 <span class="badge badge-admin">관리자</span> <span id="double-day-badge" class="badge badge-double-day" style="display:none;">🔥 2배 Day 진행 중</span></h2>
         </div>
         <div class="nav-right">
             <div class="notification-wrapper">
@@ -81,19 +81,19 @@
                                 <input type="date" id="admin-entry-date">
                             </div>
                             <div class="form-group">
-                                <label>인사</label>
+                                <label id="admin-insa-title">인사</label>
                                 <label class="checkbox-label"><input type="checkbox" id="admin-greetings"><span>했어요</span></label>
                             </div>
                             <div class="form-group">
-                                <label>과제 개수</label>
+                                <label id="admin-assignment-title">과제 개수</label>
                                 <input type="number" id="admin-assignments" min="0" max="20" value="0" class="input-small">
                             </div>
                             <div class="form-group">
                                 <label>글쓰기</label>
                                 <select id="admin-writing">
                                     <option value="none">없음</option>
-                                    <option value="5%">감사 일기 (5%)</option>
-                                    <option value="10%">주제 글쓰기 (10%)</option>
+                                    <option value="5%" id="admin-writing-5-option">감사 일기 (5%)</option>
+                                    <option value="10%" id="admin-writing-10-option">주제 글쓰기 (10%)</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -106,7 +106,7 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label>가치 도장</label>
+                            <label id="admin-stamp-title">가치 도장</label>
                             <div id="admin-value-stamps"></div>
                         </div>
                         <div class="form-row">
@@ -159,6 +159,7 @@
     <script src="js/xp-service.js?v=20260905_10"></script>
     <script src="js/date-util.js?v=20260905_10"></script>
     <script src="js/stamp-groups.js?v=20260905_10"></script>
+    <script src="js/double-day.js?v=20260905_10"></script>
     <script src="js/admin-students.js?v=20260905_10"></script>
 </body>
 </html>

@@ -2,6 +2,7 @@
 
 let currentProfile = null;
 let activeValueTypes = [];
+let isDoubleDay = false;
 
 (async () => {
     currentProfile = await requireAuth(['student']);
@@ -12,9 +13,24 @@ let activeValueTypes = [];
     // Set default date to today
     document.getElementById('entry-date').value = getTodayISO();
 
+    isDoubleDay = await getDoubleXPDayActive();
+    applyDoubleDayLabels();
+
     await loadValueTypes();
     setupFormListeners();
 })();
+
+// Titles, bonus, and penalties are never doubled - only greetings, value
+// stamps, assignments, and writing are affected by 2x Day.
+function applyDoubleDayLabels() {
+    const mult = xpMultiplier(isDoubleDay);
+    const fire = isDoubleDay ? ' 🔥' : '';
+    document.getElementById('insa-title').textContent = `인사 (${3 * mult}%${fire})`;
+    document.getElementById('stamp-title').textContent = `가치 도장 (각 ${5 * mult}%${fire})`;
+    document.getElementById('assignment-title').textContent = `과제 (각 ${5 * mult}%${fire})`;
+    document.getElementById('writing-5-label').textContent = `감사 일기 (${5 * mult}%${fire})`;
+    document.getElementById('writing-10-label').textContent = `주제 글쓰기 (${10 * mult}%${fire})`;
+}
 
 async function loadValueTypes() {
     const { data } = await db
@@ -25,10 +41,11 @@ async function loadValueTypes() {
 
     activeValueTypes = data || [];
     const container = document.getElementById('value-stamps-container');
+    const mult = xpMultiplier(isDoubleDay);
 
     renderStampGroups(container, activeValueTypes, vt => `
         <label class="checkbox-label">
-            <input type="checkbox" name="value-stamp" value="${vt.id}" data-points="${vt.points}" data-name="${vt.name}"
+            <input type="checkbox" name="value-stamp" value="${vt.id}" data-points="${vt.points * mult}" data-name="${vt.name}"
                 onchange="this.closest('.stamp-count-item').querySelector('.stamp-count').disabled = !this.checked; updatePreview();">
             <span>${vt.name}</span>
         </label>
@@ -67,39 +84,44 @@ function addTitleInput() {
 function calculateFormXP() {
     let total = 0;
     const details = [];
+    const mult = xpMultiplier(isDoubleDay);
+    const fire = isDoubleDay ? ' 🔥' : '';
 
     // Greetings
     if (document.getElementById('greetings').checked) {
-        total += 3;
-        details.push('인사: 3%');
+        const insaXP = 3 * mult;
+        total += insaXP;
+        details.push(`인사: ${insaXP}%${fire}`);
     }
 
-    // Value stamps
+    // Value stamps (data-points is already doubled when 2x Day is on)
     document.querySelectorAll('input[name="value-stamp"]:checked').forEach(cb => {
         const points = parseInt(cb.dataset.points);
         const countInput = cb.closest('.stamp-count-item').querySelector('.stamp-count');
         const count = parseInt(countInput.value) || 1;
         const stampXP = points * count;
         total += stampXP;
-        details.push(count > 1 ? `${cb.dataset.name} x${count}: ${stampXP}%` : `${cb.dataset.name}: ${points}%`);
+        details.push(count > 1 ? `${cb.dataset.name} x${count}: ${stampXP}%${fire}` : `${cb.dataset.name}: ${points}%${fire}`);
     });
 
     // Assignments
     const assignments = parseInt(document.getElementById('assignments').value) || 0;
     if (assignments > 0) {
-        const assignXP = assignments * 5;
+        const assignXP = assignments * 5 * mult;
         total += assignXP;
-        details.push(`과제 ${assignments}개: ${assignXP}%`);
+        details.push(`과제 ${assignments}개: ${assignXP}%${fire}`);
     }
 
     // Writing
     const writing = document.querySelector('input[name="writing"]:checked').value;
     if (writing === '5%') {
-        total += 5;
-        details.push('감사 일기: 5%');
+        const writeXP = 5 * mult;
+        total += writeXP;
+        details.push(`감사 일기: ${writeXP}%${fire}`);
     } else if (writing === '10%') {
-        total += 10;
-        details.push('주제 글쓰기: 10%');
+        const writeXP = 10 * mult;
+        total += writeXP;
+        details.push(`주제 글쓰기: ${writeXP}%${fire}`);
     }
 
     // Titles
@@ -170,6 +192,7 @@ async function submitEntry() {
             assignments: assignments,
             writing_type: writing,
             status: 'pending',
+            is_double_day: isDoubleDay,
             modified_at: getNowKST(),
             modified_by: currentProfile.id
         })

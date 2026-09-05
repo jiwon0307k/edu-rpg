@@ -57,31 +57,37 @@ async function loadPendingEntries() {
 
         let xpItems = [];
         let totalXP = 0;
+        const mult = xpMultiplier(entry.is_double_day);
+        const fire = entry.is_double_day ? ' 🔥' : '';
 
         if (entry.greetings) {
-            xpItems.push('인사 3%');
-            totalXP += 3;
+            const insaXP = 3 * mult;
+            xpItems.push(`인사 ${insaXP}%${fire}`);
+            totalXP += insaXP;
         }
 
+        // entry_value_stamps.points is already doubled at submission time
         entryStamps.forEach(s => {
             const count = s.count || 1;
             const stampXP = s.points * count;
-            xpItems.push(count > 1 ? `${s.value_name} x${count} ${stampXP}%` : `${s.value_name} ${s.points}%`);
+            xpItems.push(count > 1 ? `${s.value_name} x${count} ${stampXP}%${fire}` : `${s.value_name} ${s.points}%${fire}`);
             totalXP += stampXP;
         });
 
         if (entry.assignments > 0) {
-            const assignXP = entry.assignments * 5;
-            xpItems.push(`과제 ${entry.assignments}개 ${assignXP}%`);
+            const assignXP = entry.assignments * 5 * mult;
+            xpItems.push(`과제 ${entry.assignments}개 ${assignXP}%${fire}`);
             totalXP += assignXP;
         }
 
         if (entry.writing_type === '5%') {
-            xpItems.push('감사 일기 5%');
-            totalXP += 5;
+            const writeXP = 5 * mult;
+            xpItems.push(`감사 일기 ${writeXP}%${fire}`);
+            totalXP += writeXP;
         } else if (entry.writing_type === '10%') {
-            xpItems.push('주제 글쓰기 10%');
-            totalXP += 10;
+            const writeXP = 10 * mult;
+            xpItems.push(`주제 글쓰기 ${writeXP}%${fire}`);
+            totalXP += writeXP;
         }
 
         entryTitles.forEach(t => {
@@ -298,6 +304,10 @@ async function openEditModal(entryId) {
         .select('*')
         .eq('entry_id', entryId);
 
+    // Use this entry's own is_double_day flag (not the live toggle) so editing
+    // preserves whatever multiplier applied when it was originally submitted
+    const editMult = xpMultiplier(entry.is_double_day);
+
     const container = document.getElementById('edit-value-stamps');
     renderStampGroups(container, allValueTypes.filter(vt => vt.active), vt => {
         const existingStamp = (stamps || []).find(s => s.value_type_id === vt.id);
@@ -305,9 +315,9 @@ async function openEditModal(entryId) {
         const count = existingStamp ? (existingStamp.count || 1) : 1;
         return `
             <label class="checkbox-label">
-                <input type="checkbox" name="edit-vt" value="${vt.id}" data-points="${vt.points}" data-name="${vt.name}" ${checked ? 'checked' : ''}
+                <input type="checkbox" name="edit-vt" value="${vt.id}" data-points="${vt.points * editMult}" data-name="${vt.name}" ${checked ? 'checked' : ''}
                     onchange="this.closest('.stamp-count-item').querySelector('.stamp-count').disabled = !this.checked;">
-                <span>${vt.name} (${vt.points}%)</span>
+                <span>${vt.name}</span>
             </label>
             <input type="number" class="stamp-count input-small" min="1" max="20" value="${count}" ${checked ? '' : 'disabled'}
                 data-vt-id="${vt.id}">

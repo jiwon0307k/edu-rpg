@@ -103,15 +103,17 @@ async function loadProgressTable() {
             const entryTitles = (titles || []).filter(t => t.entry_id === entry.id);
 
             // Compute the day's total XP first so it can be shown up front
+            // (titles, bonus, and penalties are never doubled)
+            const mult = entry.is_double_day ? 2 : 1;
             let dailyXP = 0;
-            if (entry.greetings) dailyXP += 3;
+            if (entry.greetings) dailyXP += 3 * mult;
             orderedValueTypes.forEach(vt => {
                 const stamp = entryStamps.find(s => s.value_type_id === vt.id);
                 if (stamp) dailyXP += stamp.points * (stamp.count || 1);
             });
-            if (entry.assignments > 0) dailyXP += entry.assignments * 5;
-            if (entry.writing_type === '5%') dailyXP += 5;
-            else if (entry.writing_type === '10%') dailyXP += 10;
+            if (entry.assignments > 0) dailyXP += entry.assignments * 5 * mult;
+            if (entry.writing_type === '5%') dailyXP += 5 * mult;
+            else if (entry.writing_type === '10%') dailyXP += 10 * mult;
             if (entryTitles.length > 0) dailyXP += entryTitles.length * 20;
             if (entry.bonus_points > 0) dailyXP += entry.bonus_points;
 
