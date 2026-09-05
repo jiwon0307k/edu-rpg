@@ -884,9 +884,10 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .stamp-count-item .stamp-count {
-    width: 30px !important;
-    min-width: 30px;
-    padding: 2px 4px;
+    width: 54px !important;
+    min-width: 52px;
+    padding: 2px 2px;
+    font-size: 0.85rem;
     text-align: center;
     flex-shrink: 0;
     box-sizing: border-box;
