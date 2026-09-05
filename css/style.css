@@ -468,6 +468,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     overflow: hidden;
     border: 1px solid var(--border);
     box-shadow: inset 0 2px 4px rgba(140, 105, 40, 0.12);
+    position: relative;
 }
 
 .xp-bar {
@@ -497,6 +498,58 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 @keyframes shimmer {
     0% { transform: translateX(-100%); }
     100% { transform: translateX(100%); }
+}
+
+/* === Pending XP visualization (awaiting teacher approval) === */
+.pending-xp-badge {
+    display: inline-block;
+    background: rgba(245, 183, 56, 0.18);
+    border: 1px solid var(--primary);
+    color: var(--heading);
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 999px;
+    margin-bottom: 10px;
+}
+
+.pending-xp-badge.level-up {
+    background: rgba(245, 183, 56, 0.32);
+    border-color: var(--primary-dark);
+    box-shadow: 0 0 10px rgba(245, 183, 56, 0.45);
+}
+
+.exp-bar-pending {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 0%;
+    background: repeating-linear-gradient(
+        45deg,
+        rgba(255, 224, 130, 0.55),
+        rgba(255, 224, 130, 0.55) 8px,
+        rgba(255, 244, 200, 0.35) 8px,
+        rgba(255, 244, 200, 0.35) 16px
+    );
+    border-radius: 999px;
+    transition: width 0.8s ease, left 0.8s ease;
+    animation: pending-pulse 1.4s ease-in-out infinite;
+    pointer-events: none;
+}
+
+.exp-bar-pending.level-up-glow {
+    animation: pending-pulse 1.1s ease-in-out infinite, pending-glow 1.6s ease-in-out infinite;
+}
+
+@keyframes pending-pulse {
+    0%, 100% { opacity: 0.55; }
+    50% { opacity: 1; }
+}
+
+@keyframes pending-glow {
+    0%, 100% { box-shadow: 0 0 4px rgba(245, 183, 56, 0.5); }
+    50% { box-shadow: 0 0 18px rgba(245, 183, 56, 0.9); }
 }
 
 .xp-text {

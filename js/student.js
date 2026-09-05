@@ -91,6 +91,7 @@ async function loadProgressTable() {
     const colCount = allValueTypes.length + 5; // greetings + valueTypes + assignments + writing + titles + bonus
 
     let cumulativeXP = 0;
+    let pendingXP = 0;
 
     timeline.forEach(item => {
         if (item.type === 'entry') {
@@ -114,7 +115,11 @@ async function loadProgressTable() {
             if (entryTitles.length > 0) dailyXP += entryTitles.length * 20;
             if (entry.bonus_points > 0) dailyXP += entry.bonus_points;
 
-            if (entry.status === 'approved') cumulativeXP += dailyXP;
+            if (entry.status === 'approved') {
+                cumulativeXP += dailyXP;
+            } else {
+                pendingXP += dailyXP;
+            }
 
             const dateCell = document.createElement('td');
             dateCell.textContent = entry.date;
@@ -230,8 +235,38 @@ async function loadProgressTable() {
     });
 
     // Update level display
-        const { level, remainder } = calculateLevel(cumulativeXP);
+    const { level, remainder } = calculateLevel(cumulativeXP);
     document.getElementById('level-badge').textContent = 'Lv.' + level;
     document.getElementById('xp-bar').style.width = remainder + '%';
     document.getElementById('xp-text').textContent = remainder + '%';
+
+    renderPendingXP(cumulativeXP, pendingXP);
+}
+
+// Visualizes XP still awaiting teacher approval as a translucent pulsing
+// overlay continuing on from the confirmed XP bar.
+function renderPendingXP(cumulativeXP, pendingXP) {
+    const pendingBar = document.getElementById('exp-bar-pending');
+    const badge = document.getElementById('pending-xp-badge');
+
+    if (!pendingXP || pendingXP <= 0) {
+        pendingBar.style.width = '0%';
+        badge.style.display = 'none';
+        return;
+    }
+
+    const { level: currentLevel, remainder: currentRemainder } = calculateLevel(cumulativeXP);
+    const projectedXP = cumulativeXP + pendingXP;
+    const { level: projectedLevel, remainder: projectedRemainder } = calculateLevel(projectedXP);
+    const willLevelUp = projectedLevel > currentLevel;
+
+    pendingBar.style.left = currentRemainder + '%';
+    pendingBar.style.width = (willLevelUp ? 100 - currentRemainder : pendingXP) + '%';
+    pendingBar.classList.toggle('level-up-glow', willLevelUp);
+
+    badge.classList.toggle('level-up', willLevelUp);
+    badge.style.display = 'inline-block';
+    badge.textContent = willLevelUp
+        ? `✨ 승인 대기 중: +${pendingXP}% (승인 완료 시 Lv.${projectedLevel} ${projectedRemainder}% 달성 예정! 🎉)`
+        : `⏳ 승인 대기 중: +${pendingXP}% (승인 완료 시 Lv.${projectedLevel} ${projectedRemainder}% 예정)`;
 }
