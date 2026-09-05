@@ -57,9 +57,13 @@ async function logout() {
 if (document.getElementById('login-form')) {
     // If already logged in, redirect
     (async () => {
-        const profile = await getProfile();
-        if (profile) {
-            window.location.href = profile.role === 'admin' ? 'admin-students.html' : 'student.html';
+        try {
+            const profile = await getProfile();
+            if (profile) {
+                window.location.href = profile.role === 'admin' ? 'admin-students.html' : 'student.html';
+            }
+        } catch (err) {
+            console.error('Auto-login check failed:', err);
         }
     })();
 
@@ -70,20 +74,31 @@ if (document.getElementById('login-form')) {
         const errorEl = document.getElementById('login-error');
         errorEl.style.display = 'none';
 
-        const { data, error } = await db.auth.signInWithPassword({ email, password });
+        const submitBtn = document.querySelector('#login-form button[type="submit"]');
+        if (submitBtn) submitBtn.disabled = true;
 
-        if (error) {
-            errorEl.textContent = '로그인에 실패했습니다. 아이디와 비밀번호를 확인하세요.';
-            errorEl.style.display = 'block';
-            return;
-        }
+        try {
+            const { data, error } = await db.auth.signInWithPassword({ email, password });
 
-        const profile = await getProfile();
-        if (profile) {
-            window.location.href = profile.role === 'admin' ? 'admin-students.html' : 'student.html';
-        } else {
-            errorEl.textContent = '프로필 정보를 찾을 수 없습니다.';
+            if (error) {
+                errorEl.textContent = '로그인에 실패했습니다. 아이디와 비밀번호를 확인하세요.';
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            const profile = await getProfile();
+            if (profile) {
+                window.location.href = profile.role === 'admin' ? 'admin-students.html' : 'student.html';
+            } else {
+                errorEl.textContent = '프로필 정보를 찾을 수 없습니다.';
+                errorEl.style.display = 'block';
+            }
+        } catch (err) {
+            console.error('Login error:', err);
+            errorEl.textContent = '로그인 중 오류가 발생했습니다. 네트워크 상태를 확인하고 다시 시도해주세요.';
             errorEl.style.display = 'block';
+        } finally {
+            if (submitBtn) submitBtn.disabled = false;
         }
     });
 }
