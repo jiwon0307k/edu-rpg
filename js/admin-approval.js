@@ -299,14 +299,11 @@ async function openEditModal(entryId) {
         .eq('entry_id', entryId);
 
     const container = document.getElementById('edit-value-stamps');
-    container.innerHTML = '';
-    allValueTypes.filter(vt => vt.active).forEach(vt => {
+    renderStampGroups(container, allValueTypes.filter(vt => vt.active), vt => {
         const existingStamp = (stamps || []).find(s => s.value_type_id === vt.id);
         const checked = !!existingStamp;
         const count = existingStamp ? (existingStamp.count || 1) : 1;
-        const item = document.createElement('div');
-        item.className = 'stamp-count-item';
-        item.innerHTML = `
+        return `
             <label class="checkbox-label">
                 <input type="checkbox" name="edit-vt" value="${vt.id}" data-points="${vt.points}" data-name="${vt.name}" ${checked ? 'checked' : ''}
                     onchange="this.closest('.stamp-count-item').querySelector('.stamp-count').disabled = !this.checked;">
@@ -315,7 +312,6 @@ async function openEditModal(entryId) {
             <input type="number" class="stamp-count input-small" min="1" max="20" value="${count}" ${checked ? '' : 'disabled'}
                 data-vt-id="${vt.id}">
         `;
-        container.appendChild(item);
     });
 
     // Load titles for this entry

@@ -133,20 +133,14 @@ async function showStudentDetail(studentId, studentName) {
 
     // Load admin value stamp checkboxes with count inputs
     const container = document.getElementById('admin-value-stamps');
-    container.innerHTML = '';
-    allValueTypes.filter(vt => vt.active).forEach(vt => {
-        const item = document.createElement('div');
-        item.className = 'stamp-count-item';
-        item.innerHTML = `
-            <label class="checkbox-label">
-                <input type="checkbox" name="admin-vt" value="${vt.id}" data-points="${vt.points}" data-name="${vt.name}"
-                    onchange="this.closest('.stamp-count-item').querySelector('.stamp-count').disabled = !this.checked;">
-                <span>${vt.name} (${vt.points}%)</span>
-            </label>
-            <input type="number" class="stamp-count input-small" min="1" max="20" value="1" disabled data-vt-id="${vt.id}">
-        `;
-        container.appendChild(item);
-    });
+    renderStampGroups(container, allValueTypes.filter(vt => vt.active), vt => `
+        <label class="checkbox-label">
+            <input type="checkbox" name="admin-vt" value="${vt.id}" data-points="${vt.points}" data-name="${vt.name}"
+                onchange="this.closest('.stamp-count-item').querySelector('.stamp-count').disabled = !this.checked;">
+            <span>${vt.name} (${vt.points}%)</span>
+        </label>
+        <input type="number" class="stamp-count input-small" min="1" max="20" value="1" disabled data-vt-id="${vt.id}">
+    `);
 
     await loadStudentEntries(studentId, studentName);
 

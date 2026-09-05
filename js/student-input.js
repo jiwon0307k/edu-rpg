@@ -25,22 +25,16 @@ async function loadValueTypes() {
 
     activeValueTypes = data || [];
     const container = document.getElementById('value-stamps-container');
-    container.innerHTML = '';
 
-    activeValueTypes.forEach(vt => {
-        const item = document.createElement('div');
-        item.className = 'stamp-count-item';
-        item.innerHTML = `
-            <label class="checkbox-label">
-                <input type="checkbox" name="value-stamp" value="${vt.id}" data-points="${vt.points}" data-name="${vt.name}"
-                    onchange="this.closest('.stamp-count-item').querySelector('.stamp-count').disabled = !this.checked; updatePreview();">
-                <span>${vt.name} (${vt.points}%)</span>
-            </label>
-            <input type="number" class="stamp-count input-small" min="1" max="20" value="1" disabled
-                data-vt-id="${vt.id}" oninput="updatePreview();">
-        `;
-        container.appendChild(item);
-    });
+    renderStampGroups(container, activeValueTypes, vt => `
+        <label class="checkbox-label">
+            <input type="checkbox" name="value-stamp" value="${vt.id}" data-points="${vt.points}" data-name="${vt.name}"
+                onchange="this.closest('.stamp-count-item').querySelector('.stamp-count').disabled = !this.checked; updatePreview();">
+            <span>${vt.name} (${vt.points}%)</span>
+        </label>
+        <input type="number" class="stamp-count input-small" min="1" max="20" value="1" disabled
+            data-vt-id="${vt.id}" oninput="updatePreview();">
+    `);
 }
 
 function setupFormListeners() {

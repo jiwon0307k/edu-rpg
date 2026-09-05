@@ -140,9 +140,9 @@ body {
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: 14px;
-    padding: 40px;
-    width: 100%;
-    max-width: 400px;
+    padding: 36px;
+    width: 380px;
+    max-width: 100%;
     box-shadow: var(--card-shadow);
 }
 
@@ -165,7 +165,7 @@ body {
 #password {
     background: #FFFFFF;
     border: 1px solid #E2D4BC;
-    height: 46px;
+    height: 48px;
     padding: 0 14px;
 }
 
@@ -173,8 +173,10 @@ body {
     display: block;
     width: 100%;
     max-width: 200px;
+    height: 48px;
     margin: 24px auto 0;
     text-align: center;
+    border-radius: 8px;
     color: #261A0C;
 }
 
@@ -272,6 +274,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     font-size: 0.9rem;
 }
 
+.radio-label {
+    width: auto;
+    padding: 8px 12px;
+    white-space: nowrap;
+}
+
 .checkbox-label:hover,
 .radio-label:hover {
     border-color: var(--primary);
@@ -311,6 +319,11 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     border-radius: 8px;
     margin-bottom: 12px;
     flex-wrap: wrap;
+}
+
+#admin-add-entry > h4 {
+    width: 100%;
+    margin-bottom: 24px;
 }
 
 .inline-form input[type="text"],
@@ -822,10 +835,27 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     position: relative;
 }
 
-/* === Stamp Count Item (value-stamp tag chips) === */
-#value-stamps-container,
-#admin-value-stamps,
-#edit-value-stamps {
+/* === Stamp Groups (value-stamp tag chips split into mini cards) === */
+.stamp-group {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+}
+
+.stamp-group:last-child {
+    margin-bottom: 0;
+}
+
+.stamp-group h5 {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--heading);
+    margin-bottom: 8px;
+}
+
+.stamp-group-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 10px;
@@ -836,7 +866,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     align-items: center;
     gap: 6px;
     padding: 6px 10px;
-    background: var(--bg-card);
+    background: var(--bg);
     border: 1px solid var(--border);
     border-radius: 999px;
     transition: background 0.2s, border-color 0.2s;
@@ -995,9 +1025,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         gap: 4px;
     }
 
-    #value-stamps-container,
-    #admin-value-stamps,
-    #edit-value-stamps {
+    .stamp-group-grid {
         grid-template-columns: repeat(2, 1fr);
     }
 }
