@@ -1034,3 +1034,52 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         width: 100%;
     }
 }
+
+/* === Mobile phone fixes (does not affect desktop/tablet) === */
+@media (max-width: 480px) {
+    body,
+    .container {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    /* Value-stamp chips: fit 2 columns without clipping */
+    .stamp-group-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
+        min-width: 0;
+    }
+
+    .stamp-count-item {
+        padding: 6px 8px;
+        font-size: 13px;
+    }
+
+    .stamp-count-item .stamp-count {
+        width: 34px;
+        padding: 4px 2px;
+    }
+
+    /* Writing option cards: stack into one column for easy tapping */
+    .radio-group {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .radio-group .radio-label {
+        width: 100%;
+    }
+
+    /* Hide any injected Netlify badge/iframe that can overlap mobile content */
+    [aria-label*="Netlify"],
+    .netlify-badge,
+    #netlify-badge,
+    iframe[src*="netlify"] {
+        display: none !important;
+    }
+
+    /* Keep the submit button clear of any bottom overlay */
+    .form-card {
+        padding-bottom: 70px;
+    }
+}
