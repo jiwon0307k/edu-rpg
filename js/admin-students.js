@@ -329,9 +329,25 @@ function addAdminTitleInput() {
     container.appendChild(row);
 }
 
+let isSubmittingAdminEntry = false;
+
 async function submitAdminEntry() {
     if (!selectedStudentId) return;
+    if (isSubmittingAdminEntry) return;
+    isSubmittingAdminEntry = true;
 
+    const submitBtn = document.getElementById('admin-entry-submit-btn');
+    if (submitBtn) submitBtn.disabled = true;
+
+    try {
+        await doSubmitAdminEntry();
+    } finally {
+        isSubmittingAdminEntry = false;
+        if (submitBtn) submitBtn.disabled = false;
+    }
+}
+
+async function doSubmitAdminEntry() {
     const date = document.getElementById('admin-entry-date').value;
     const greetings = document.getElementById('admin-greetings').checked;
     const assignments = parseInt(document.getElementById('admin-assignments').value) || 0;
@@ -577,9 +593,25 @@ async function updatePenaltyPreview() {
     }
 }
 
+let isApplyingPenalties = false;
+
 async function applyPenalties() {
     if (!selectedStudentId) return;
+    if (isApplyingPenalties) return;
+    isApplyingPenalties = true;
 
+    const applyBtn = document.getElementById('apply-penalty-btn');
+    if (applyBtn) applyBtn.disabled = true;
+
+    try {
+        await doApplyPenalties();
+    } finally {
+        isApplyingPenalties = false;
+        if (applyBtn) applyBtn.disabled = false;
+    }
+}
+
+async function doApplyPenalties() {
     const rows = document.querySelectorAll('.penalty-row-item');
     if (rows.length === 0) return;
 
@@ -658,8 +690,6 @@ async function applyPenalties() {
             modified_at: getNowKST(),
             modified_by: currentProfile.id
         });
-        remaining -= deduction;
-
         remaining -= deduction;
         if (remaining < 0) remaining = 0;
     });

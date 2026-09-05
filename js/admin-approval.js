@@ -113,7 +113,20 @@ async function loadPendingEntries() {
     });
 }
 
+const entriesInProgress = new Set();
+
+function disableCardActions(entryId) {
+    const card = document.getElementById(`entry-card-${entryId}`);
+    if (card) {
+        card.querySelectorAll('.approval-actions button').forEach(btn => btn.disabled = true);
+    }
+}
+
 async function approveEntry(entryId) {
+    if (entriesInProgress.has(entryId)) return;
+    entriesInProgress.add(entryId);
+    disableCardActions(entryId);
+
     const auditFields = { modified_at: getNowKST(), modified_by: currentProfile.id };
 
     // Approve entry
@@ -152,7 +165,11 @@ async function approveEntry(entryId) {
 }
 
 async function rejectEntry(entryId) {
+    if (entriesInProgress.has(entryId)) return;
     if (!confirm('이 항목을 거절하시겠습니까? 삭제됩니다.')) return;
+
+    entriesInProgress.add(entryId);
+    disableCardActions(entryId);
 
     // Get student_id before deleting
     const { data: entryData } = await db
@@ -185,9 +202,25 @@ async function rejectEntry(entryId) {
     }
 }
 
+let isApprovingAll = false;
+
 async function approveAll() {
+    if (isApprovingAll) return;
     if (!confirm('모든 대기 중인 항목을 승인하시겠습니까?')) return;
 
+    isApprovingAll = true;
+    const approveAllBtn = document.getElementById('approve-all-btn');
+    if (approveAllBtn) approveAllBtn.disabled = true;
+
+    try {
+        await doApproveAll();
+    } finally {
+        isApprovingAll = false;
+        if (approveAllBtn) approveAllBtn.disabled = false;
+    }
+}
+
+async function doApproveAll() {
     // Get pending entries before approving (for XP recalculation)
     const { data: pendingEntries } = await db
         .from('daily_entries')
@@ -318,7 +351,24 @@ function closeEditModal() {
     editEntryData = null;
 }
 
+let isSavingEdit = false;
+
 async function saveEdit() {
+    if (isSavingEdit) return;
+    isSavingEdit = true;
+
+    const saveBtn = document.getElementById('save-edit-btn');
+    if (saveBtn) saveBtn.disabled = true;
+
+    try {
+        await doSaveEdit();
+    } finally {
+        isSavingEdit = false;
+        if (saveBtn) saveBtn.disabled = false;
+    }
+}
+
+async function doSaveEdit() {
     const entryId = parseInt(document.getElementById('edit-entry-id').value);
     const date = document.getElementById('edit-date').value;
     const greetings = document.getElementById('edit-greetings').checked;

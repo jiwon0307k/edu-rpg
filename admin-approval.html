@@ -30,7 +30,7 @@
         <div class="card">
             <div class="card-header">
                 <h3>📝 승인 대기 목록</h3>
-                <button class="btn btn-small btn-primary" onclick="approveAll()">전체 승인</button>
+                <button id="approve-all-btn" class="btn btn-small btn-primary" onclick="approveAll()">전체 승인</button>
             </div>
             <div id="pending-list"></div>
             <p id="no-pending" class="text-center text-muted" style="display:none;">승인 대기 중인 항목이 없습니다.</p>
@@ -81,7 +81,7 @@
                     </div>
                 </div>
                 <div class="form-actions">
-                    <button type="button" class="btn btn-primary" onclick="saveEdit()">수정 후 승인</button>
+                    <button id="save-edit-btn" type="button" class="btn btn-primary" onclick="saveEdit()">수정 후 승인</button>
                     <button type="button" class="btn btn-secondary" onclick="closeEditModal()">취소</button>
                 </div>
             </form>

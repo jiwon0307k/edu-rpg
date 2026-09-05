@@ -134,9 +134,26 @@ function updatePreview() {
     }
 }
 
+let isSubmitting = false;
+
 async function handleSubmit(e) {
     e.preventDefault();
 
+    if (isSubmitting) return;
+    isSubmitting = true;
+
+    const submitBtn = document.querySelector('#xp-form button[type="submit"]');
+    if (submitBtn) submitBtn.disabled = true;
+
+    try {
+        await submitEntry();
+    } finally {
+        isSubmitting = false;
+        if (submitBtn) submitBtn.disabled = false;
+    }
+}
+
+async function submitEntry() {
     const date = document.getElementById('entry-date').value;
     const greetings = document.getElementById('greetings').checked;
     const assignments = parseInt(document.getElementById('assignments').value) || 0;
