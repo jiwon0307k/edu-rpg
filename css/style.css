@@ -1029,6 +1029,33 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     flex-wrap: wrap;
 }
 
+.batch-stamp-type,
+.batch-stamp-count,
+.batch-penalty-type,
+.batch-penalty-count {
+    height: 34px;
+    box-sizing: border-box;
+    font-size: 13px;
+    background-color: var(--bg);
+    border: 1px solid #EEDBB2;
+    border-radius: 6px;
+    padding: 0 10px;
+    color: #3E2723;
+}
+
+.batch-stamp-type,
+.batch-penalty-type {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath fill='%233E2E1E' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 10px 7px;
+    min-width: 120px;
+    padding-right: 30px;
+}
+
 .batch-bonus-line {
     display: flex;
     gap: 8px;
