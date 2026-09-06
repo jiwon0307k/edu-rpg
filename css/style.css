@@ -1228,8 +1228,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 5px 6px;
-        font-size: 12px;
+        padding: 4px 6px;
+        font-size: 13px;
+        letter-spacing: -0.5px;
         gap: 4px;
     }
 
@@ -1237,9 +1238,15 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         gap: 4px;
     }
 
+    .stamp-count-item .checkbox-label span {
+        white-space: nowrap;
+    }
+
     .stamp-count-item .stamp-count {
-        width: 46px !important;
-        min-width: 46px;
+        width: 44px !important;
+        min-width: 44px;
+        padding: 2px 2px;
+        font-size: 13px;
     }
 }
 
