@@ -1136,12 +1136,22 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 /* === Notification Bell === */
+/* Fixed square icon box (+ padding as extra touch target) so the 🔔 glyph
+   never gets squeezed/stretched by the flex nav row on narrow screens */
 .notification-bell {
     position: relative;
     cursor: pointer;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    aspect-ratio: 1 / 1;
+    box-sizing: content-box;
+    padding: 4px;
     font-size: 1.3rem;
     line-height: 1;
-    padding: 4px 6px;
     background: none;
     border: none;
     color: var(--text);
@@ -1154,16 +1164,20 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .notification-bell .notif-badge {
     position: absolute;
-    top: -4px;
-    right: -6px;
-    background: var(--danger);
-    color: white;
-    font-size: 0.65rem;
+    top: -3px;
+    right: -5px;
+    min-width: 17px;
+    height: 17px;
+    padding: 0 4px;
+    box-sizing: border-box;
+    border-radius: 9999px;
+    background: #e05353;
+    color: #ffffff;
+    font-size: 11px;
     font-weight: 700;
-    padding: 1px 5px;
-    border-radius: 10px;
-    min-width: 16px;
+    line-height: 17px;
     text-align: center;
+    border: 1.5px solid var(--bg-card);
 }
 
 .notification-dropdown {
@@ -1432,6 +1446,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .notification-wrapper {
     position: relative;
+    flex-shrink: 0;
 }
 
 /* === Stamp Grid (value-stamp tag chips, life/study segments divided by a thin rule) === */
