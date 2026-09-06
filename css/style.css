@@ -269,7 +269,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .radio-label {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     padding: 8px 14px;
     width: 150px;
     background: var(--bg);
@@ -351,6 +351,10 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .form-row .form-group {
     flex: 1;
     min-width: 150px;
+}
+
+#admin-writing-group {
+    margin-right: 18px;
 }
 
 .form-actions {
@@ -1233,10 +1237,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         gap: 4px;
     }
 
-    .stamp-count-item .checkbox-label span {
-        overflow: visible;
-        text-overflow: unset;
-        white-space: normal;
+    .stamp-count-item .stamp-count {
+        width: 46px !important;
+        min-width: 46px;
     }
 }
 

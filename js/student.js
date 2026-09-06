@@ -272,8 +272,8 @@ function showLevelUpModal(studentId, level) {
 
     document.getElementById('level-up-badge').textContent = 'Lv.' + level;
     document.getElementById('level-up-title').textContent = isMilestone
-        ? `👑 눈부신 마일스톤 달성! Lv.${level} 도달을 축하합니다! 🌟`
-        : '🎉 레벨 업! 멋진 성장을 축하해요!';
+        ? `🎊 레벨 ${level} 도달! 축하해요! ✨`
+        : '🎉 레벨 업! 한 단계 성장했어요!';
 
     const modal = document.getElementById('level-up-modal');
     modal.dataset.studentId = studentId;
@@ -307,15 +307,15 @@ function fireMilestoneConfetti() {
             spread: 80,
             startVelocity: 35,
             gravity: 0.7,
-            ticks: 260,
+            ticks: 350,
             origin: { x: originX, y: 0.6 },
             colors: pastelColors
         });
     };
 
-    // Left, center, right - fired 1.5s apart
-    [0.2, 0.5, 0.8].forEach((x, i) => {
-        setTimeout(() => shoot(x), i * 1500);
+    // Relay across left/right/center, 0.8s apart, ~3.5-4s of total confetti
+    [0.2, 0.8, 0.5, 0.2, 0.8].forEach((x, i) => {
+        setTimeout(() => shoot(x), i * 800);
     });
 }
 
