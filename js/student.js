@@ -243,6 +243,80 @@ async function loadProgressTable() {
     document.getElementById('xp-text').textContent = remainder + '%';
 
     renderPendingXP(cumulativeXP, pendingXP);
+    checkLevelUpCelebration(currentProfile.id, level);
+}
+
+// --- Level Up Celebration ---
+function checkLevelUpCelebration(studentId, currentLevel) {
+    const key = `rpg_last_level_${studentId}`;
+    const stored = localStorage.getItem(key);
+    const isFirstVisit = stored === null;
+    const lastLevel = isFirstVisit ? 1 : (parseInt(stored, 10) || 1);
+
+    // First-ever visit on this browser: only announce if they already
+    // arrived at a level above the default Lv.1 (e.g. a returning student
+    // opening the app on a new device).
+    const shouldCelebrate = isFirstVisit ? currentLevel >= 2 : currentLevel > lastLevel;
+
+    if (shouldCelebrate) {
+        showLevelUpModal(studentId, currentLevel);
+    } else {
+        // Nothing to celebrate right now - keep the baseline in sync so a
+        // later real level-up is detected correctly.
+        localStorage.setItem(key, String(currentLevel));
+    }
+}
+
+function showLevelUpModal(studentId, level) {
+    const isMilestone = level % 5 === 0;
+
+    document.getElementById('level-up-badge').textContent = 'Lv.' + level;
+    document.getElementById('level-up-title').textContent = isMilestone
+        ? `👑 눈부신 마일스톤 달성! Lv.${level} 도달을 축하합니다! 🌟`
+        : '🎉 레벨 업! 멋진 성장을 축하해요!';
+
+    const modal = document.getElementById('level-up-modal');
+    modal.dataset.studentId = studentId;
+    modal.dataset.level = level;
+    modal.style.display = 'flex';
+
+    if (isMilestone) {
+        fireMilestoneConfetti();
+    }
+}
+
+// Only saving the level here (not while merely detecting it) is what
+// prevents the modal from being skipped if the student refreshes before
+// dismissing it.
+function closeLevelUpModal() {
+    const modal = document.getElementById('level-up-modal');
+    const { studentId, level } = modal.dataset;
+    if (studentId && level) {
+        localStorage.setItem(`rpg_last_level_${studentId}`, level);
+    }
+    modal.style.display = 'none';
+}
+
+function fireMilestoneConfetti() {
+    if (typeof confetti !== 'function') return;
+
+    const pastelColors = ['#F7D070', '#FFE89E', '#FFB7B2', '#FFDAC1', '#B5EAD7', '#C7CEEA'];
+    const shoot = (originX) => {
+        confetti({
+            particleCount: 65,
+            spread: 80,
+            startVelocity: 35,
+            gravity: 0.7,
+            ticks: 260,
+            origin: { x: originX, y: 0.6 },
+            colors: pastelColors
+        });
+    };
+
+    // Left, center, right - fired 1.5s apart
+    [0.2, 0.5, 0.8].forEach((x, i) => {
+        setTimeout(() => shoot(x), i * 1500);
+    });
 }
 
 // Visualizes XP still awaiting teacher approval as a translucent pulsing

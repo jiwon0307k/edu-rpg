@@ -812,6 +812,59 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     margin: 12px 0;
 }
 
+/* === Level Up Celebration === */
+.level-up-card {
+    background: #FFFDF7;
+    border: 2px solid #F4E4BA;
+    border-radius: 20px;
+    box-shadow: 0 12px 40px rgba(180, 140, 60, 0.25);
+    max-width: 360px;
+    animation: level-up-pop 0.4s ease-out;
+}
+
+@keyframes level-up-pop {
+    0% { transform: scale(0.7); opacity: 0; }
+    60% { transform: scale(1.05); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.level-up-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: var(--heading);
+    font-size: 2rem;
+    font-weight: 900;
+    letter-spacing: 1px;
+    padding: 12px 28px;
+    border-radius: 999px;
+    margin-bottom: 18px;
+    box-shadow: 0 4px 14px rgba(224, 160, 32, 0.35);
+}
+
+.level-up-card h3 {
+    color: var(--heading);
+    margin-bottom: 22px;
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+.btn-level-up {
+    background: #F3C642;
+    color: #2A1B08;
+    border: none;
+    border-radius: 999px;
+    padding: 10px 36px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.2s ease;
+}
+
+.btn-level-up:hover {
+    background: #E0A020;
+    transform: translateY(-1px);
+}
+
 .modal-wide {
     max-width: 600px;
     text-align: left;
