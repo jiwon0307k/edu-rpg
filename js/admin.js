@@ -16,27 +16,45 @@ let allPenaltyTypes = [];
 
 // --- 2x XP Day Toggle ---
 async function initDoubleDayToggle() {
-    const active = await getDoubleXPDayActive();
-    document.getElementById('double-day-toggle').checked = active;
-    updateDoubleDayStatusText(active);
+    const toggle = document.getElementById('double-day-toggle');
+
+    try {
+        const active = await getDoubleXPDayActive();
+        toggle.checked = active;
+        updateDoubleDayStatusText(active);
+    } catch (err) {
+        console.error('Failed to load 2x day state:', err);
+        toggle.checked = false;
+        updateDoubleDayStatusText(false);
+    }
+
+    // Bind here (instead of an inline onchange=""), so the handler is always
+    // attached to the live function even if the script re-runs or is cached.
+    toggle.addEventListener('change', (e) => onDoubleDayToggle(e.target.checked));
 }
 
 function updateDoubleDayStatusText(active) {
     document.getElementById('double-day-status').textContent = active
-        ? '🔥 지금 2배 Day가 켜져 있습니다! 인사/가치 도장/과제/글쓰기 배점이 2배로 적용됩니다. (칭호·보너스·감점 제외)'
-        : '꺼져 있습니다. 켜면 인사/가치 도장/과제/글쓰기 배점이 2배로 적용됩니다. (칭호·보너스·감점 제외)';
+        ? '🔥 활성화 중! 인사/가치 도장/과제/글쓰기 배점이 2배로 적용됩니다. (칭호·보너스·감점 제외)'
+        : '비활성화 (평상시 모드)';
 }
 
 async function onDoubleDayToggle(checked) {
     const toggle = document.getElementById('double-day-toggle');
     toggle.disabled = true;
 
-    const ok = await setDoubleXPDayActive(checked, currentProfile.id);
-    if (!ok) {
-        alert('설정 변경에 실패했습니다. 다시 시도해주세요.');
+    try {
+        const ok = await setDoubleXPDayActive(checked, currentProfile.id);
+        if (!ok) {
+            alert('설정 변경에 실패했습니다. 다시 시도해주세요.');
+            toggle.checked = !checked;
+        } else {
+            updateDoubleDayStatusText(checked);
+        }
+    } catch (err) {
+        console.error('Failed to update 2x day state:', err);
+        alert('설정 변경 중 오류가 발생했습니다. 다시 시도해주세요.');
         toggle.checked = !checked;
-    } else {
-        updateDoubleDayStatusText(checked);
     }
 
     toggle.disabled = false;
