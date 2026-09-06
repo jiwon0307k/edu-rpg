@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>경험치 통장 - 학생 관리</title>
-    <link rel="stylesheet" href="css/style.css?v=20260906_19">
+    <link rel="stylesheet" href="css/style.css?v=20260906_ui2">
     <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
 </head>
 <body>
@@ -253,17 +253,19 @@
         <div class="modal">
             <h3>✏️ 감점 수정</h3>
             <input type="hidden" id="edit-penalty-id">
-            <div class="form-group">
-                <label>감점 종류</label>
-                <select id="edit-penalty-type"></select>
-            </div>
-            <div class="form-group">
-                <label>횟수 (비율형은 단위 수)</label>
-                <input type="number" id="edit-penalty-count" min="1" value="1" class="input-small">
-            </div>
-            <div class="form-group">
-                <label>사유</label>
-                <input type="text" id="edit-penalty-note" placeholder="사유 (선택)" class="input-inline">
+            <div class="edit-penalty-row">
+                <div class="form-group edit-penalty-type-group">
+                    <label>감점 종류</label>
+                    <select id="edit-penalty-type"></select>
+                </div>
+                <div class="form-group edit-penalty-count-group">
+                    <label>횟수</label>
+                    <input type="number" id="edit-penalty-count" min="1" value="1">
+                </div>
+                <div class="form-group edit-penalty-note-group">
+                    <label>사유</label>
+                    <input type="text" id="edit-penalty-note" placeholder="사유 (선택)">
+                </div>
             </div>
             <div class="form-actions">
                 <button class="btn btn-primary" id="edit-penalty-save-btn" onclick="savePenaltyRowEdit()">저장</button>
@@ -275,14 +277,14 @@
     <div id="toast-container"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.100.1"></script>
-    <script src="js/supabase-config.js?v=20260906_17"></script>
-    <script src="js/auth.js?v=20260906_17"></script>
-    <script src="js/notifications.js?v=20260906_17"></script>
-    <script src="js/xp-service.js?v=20260906_17"></script>
-    <script src="js/date-util.js?v=20260906_17"></script>
-    <script src="js/stamp-groups.js?v=20260906_17"></script>
-    <script src="js/double-day.js?v=20260906_17"></script>
-    <script src="js/admin-batch-entry.js?v=20260906_17"></script>
-    <script src="js/admin-students.js?v=20260906_17"></script>
+    <script src="js/supabase-config.js?v=20260906_ui2"></script>
+    <script src="js/auth.js?v=20260906_ui2"></script>
+    <script src="js/notifications.js?v=20260906_ui2"></script>
+    <script src="js/xp-service.js?v=20260906_ui2"></script>
+    <script src="js/date-util.js?v=20260906_ui2"></script>
+    <script src="js/stamp-groups.js?v=20260906_ui2"></script>
+    <script src="js/double-day.js?v=20260906_ui2"></script>
+    <script src="js/admin-batch-entry.js?v=20260906_ui2"></script>
+    <script src="js/admin-students.js?v=20260906_ui2"></script>
 </body>
 </html>

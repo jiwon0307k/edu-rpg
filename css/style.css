@@ -1317,6 +1317,65 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     margin: 0 0 16px 0;
 }
 
+/* === Edit Penalty Modal (admin-students.html '감점 수정') — single-row butter grid === */
+.edit-penalty-row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+    margin-bottom: 16px;
+}
+
+.edit-penalty-row .form-group {
+    margin-bottom: 0;
+}
+
+.edit-penalty-type-group {
+    width: 180px;
+    flex-shrink: 0;
+}
+
+.edit-penalty-count-group {
+    width: 80px;
+    flex-shrink: 0;
+}
+
+.edit-penalty-note-group {
+    flex: 1;
+    min-width: 0;
+}
+
+#edit-penalty-type,
+#edit-penalty-count,
+#edit-penalty-note {
+    height: 40px;
+    box-sizing: border-box;
+    width: 100%;
+    background-color: #fffcf5;
+    border: 1.5px solid #ebd9b8;
+    border-radius: 8px;
+    color: var(--text);
+    padding: 0 12px;
+}
+
+#edit-penalty-count {
+    text-align: center;
+}
+
+#edit-penalty-type {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath fill='%233E2E1E' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 10px 7px;
+    padding: 0 32px 0 14px;
+}
+
+#edit-penalty-modal .form-actions {
+    margin-top: 16px;
+}
+
 .notif-empty {
     padding: 24px 16px;
     text-align: center;
@@ -1602,6 +1661,17 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
     .form-row {
         flex-direction: column;
+    }
+
+    .edit-penalty-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .edit-penalty-type-group,
+    .edit-penalty-count-group {
+        width: 100%;
     }
 
     .penalty-row-item .form-row {
