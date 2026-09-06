@@ -305,7 +305,10 @@ async function loadStudentEntries(studentId, studentName) {
 
             cells += `<td>${dailyXP}%</td>`;
             cells += `<td>${cumulativeXP}%</td>`;
-            cells += `<td><button type="button" class="btn-row-delete" title="이 기록 삭제" onclick="deleteEntryRow(${entry.id})">🗑️</button></td>`;
+            cells += `<td>
+                <button type="button" class="btn-row-edit" title="이 기록 수정" onclick="openEditEntryModal(${entry.id})">✏️</button>
+                <button type="button" class="btn-row-delete" title="이 기록 삭제" onclick="deleteEntryRow(${entry.id})">🗑️</button>
+            </td>`;
 
             row.innerHTML = cells;
             // Newest entries first, while cumulative XP is still computed oldest-to-newest above
@@ -327,7 +330,10 @@ async function loadStudentEntries(studentId, studentName) {
             if (cumulativeXP < 0) cumulativeXP = 0;
             cells += `<td>-</td>`;
             cells += `<td>${cumulativeXP}%</td>`;
-            cells += `<td><button type="button" class="btn-row-delete" title="이 감점 삭제" onclick="deletePenaltyRow(${p.id})">🗑️</button></td>`;
+            cells += `<td>
+                <button type="button" class="btn-row-edit" title="이 감점 수정" onclick="openEditPenaltyModal(${p.id})">✏️</button>
+                <button type="button" class="btn-row-delete" title="이 감점 삭제" onclick="deletePenaltyRow(${p.id})">🗑️</button>
+            </td>`;
 
             row.innerHTML = cells;
             tbody.insertBefore(row, tbody.firstChild);
@@ -387,6 +393,171 @@ async function deleteRecordAndRefresh(performDelete) {
         alert('삭제 처리 중 오류가 발생했습니다. 데이터를 보호하기 위해 변경을 취소합니다.');
     } finally {
         isDeletingRecord = false;
+    }
+}
+
+// --- Edit a single record (entry: core fields only; stamps/titles are not
+// editable here - delete and re-add if those need to change) ---
+async function openEditEntryModal(entryId) {
+    const { data: entry } = await db.from('daily_entries').select('*').eq('id', entryId).single();
+    if (!entry) return;
+
+    document.getElementById('edit-entry-id').value = entry.id;
+    document.getElementById('edit-entry-date-field').value = entry.date;
+    document.getElementById('edit-entry-greetings').checked = entry.greetings;
+    document.getElementById('edit-entry-assignments').value = entry.assignments || 0;
+    document.getElementById('edit-entry-writing').value = entry.writing_type;
+    document.getElementById('edit-entry-bonus-points').value = entry.bonus_points || 0;
+    document.getElementById('edit-entry-bonus-reason').value = entry.bonus_reason || '';
+
+    document.getElementById('edit-entry-modal').style.display = 'flex';
+}
+
+function closeEditEntryModal() {
+    document.getElementById('edit-entry-modal').style.display = 'none';
+}
+
+let isSavingEntryEdit = false;
+
+async function saveEntryRowEdit() {
+    if (isSavingEntryEdit) return;
+    isSavingEntryEdit = true;
+
+    const saveBtn = document.getElementById('edit-entry-save-btn');
+    if (saveBtn) saveBtn.disabled = true;
+
+    try {
+        const entryId = parseInt(document.getElementById('edit-entry-id').value);
+        const date = document.getElementById('edit-entry-date-field').value;
+        const greetings = document.getElementById('edit-entry-greetings').checked;
+        const assignments = parseInt(document.getElementById('edit-entry-assignments').value) || 0;
+        const writing = document.getElementById('edit-entry-writing').value;
+        const bonusPoints = parseInt(document.getElementById('edit-entry-bonus-points').value) || 0;
+        const bonusReason = document.getElementById('edit-entry-bonus-reason').value.trim();
+
+        const { error } = await db
+            .from('daily_entries')
+            .update({
+                date,
+                greetings,
+                assignments,
+                writing_type: writing,
+                bonus_points: bonusPoints,
+                bonus_reason: bonusReason,
+                modified_at: getNowKST(),
+                modified_by: currentProfile.id
+            })
+            .eq('id', entryId);
+
+        if (error) throw error;
+
+        // Source-of-truth recalculation, then rebuild the whole table so
+        // every row's running "누적 경험치" stays consistent
+        await recalculateAndSaveXP(selectedStudentId);
+        closeEditEntryModal();
+        await loadStudentEntries(selectedStudentId, selectedStudentName);
+        await loadStudents();
+    } catch (err) {
+        console.error('Entry edit failed:', err);
+        alert('수정 처리 중 오류가 발생했습니다. 데이터를 보호하기 위해 변경을 취소합니다.');
+    } finally {
+        isSavingEntryEdit = false;
+        if (saveBtn) saveBtn.disabled = false;
+    }
+}
+
+let editingPenaltyOriginal = null;
+
+async function openEditPenaltyModal(penaltyId) {
+    const { data: penalty } = await db.from('penalties').select('*').eq('id', penaltyId).single();
+    if (!penalty) return;
+    editingPenaltyOriginal = penalty;
+
+    document.getElementById('edit-penalty-id').value = penalty.id;
+
+    const select = document.getElementById('edit-penalty-type');
+    select.innerHTML = allPenaltyTypes.filter(pt => pt.active).map(pt => {
+        const typeLabel = pt.is_reset ? ' [초기화]' : pt.is_rate ? ' [비율형]' : '';
+        const selected = pt.id === penalty.penalty_type_id ? 'selected' : '';
+        return `<option value="${pt.id}" data-percent="${pt.percent}" data-reset="${pt.is_reset}" data-rate="${pt.is_rate}" data-rate-unit-count="${pt.rate_unit_count || 1}" ${selected}>${pt.name} (${pt.percent}%)${typeLabel}</option>`;
+    }).join('');
+
+    document.getElementById('edit-penalty-count').value = penalty.count || 1;
+    document.getElementById('edit-penalty-note').value = penalty.note || '';
+
+    document.getElementById('edit-penalty-modal').style.display = 'flex';
+}
+
+function closeEditPenaltyModal() {
+    document.getElementById('edit-penalty-modal').style.display = 'none';
+    editingPenaltyOriginal = null;
+}
+
+let isSavingPenaltyEdit = false;
+
+async function savePenaltyRowEdit() {
+    if (isSavingPenaltyEdit || !editingPenaltyOriginal) return;
+    isSavingPenaltyEdit = true;
+
+    const saveBtn = document.getElementById('edit-penalty-save-btn');
+    if (saveBtn) saveBtn.disabled = true;
+
+    try {
+        const penaltyId = parseInt(document.getElementById('edit-penalty-id').value);
+        const select = document.getElementById('edit-penalty-type');
+        const opt = select.options[select.selectedIndex];
+        if (!opt) return;
+
+        const isReset = opt.dataset.reset === 'true';
+        const isRate = opt.dataset.rate === 'true';
+        const percent = parseInt(opt.dataset.percent);
+        const rateUnitCount = parseInt(opt.dataset.rateUnitCount) || 1;
+        const count = parseInt(document.getElementById('edit-penalty-count').value) || 1;
+        const note = document.getElementById('edit-penalty-note').value.trim() || null;
+        const typeName = opt.textContent.split(' (')[0];
+
+        const percentPerCount = isRate ? Math.floor((count / rateUnitCount) * percent) : percent;
+
+        // Recompute the deduction against the student's XP as if this
+        // penalty's OLD effect were undone first, then re-cap against that
+        // ceiling - never a naive subtraction of the new percent
+        const { data: profile } = await db
+            .from('profiles')
+            .select('total_xp')
+            .eq('id', selectedStudentId)
+            .single();
+
+        const ceiling = (profile?.total_xp || 0) + editingPenaltyOriginal.xp_deducted;
+        let newDeduction = isReset ? ceiling : percentPerCount * count;
+        if (newDeduction > ceiling) newDeduction = ceiling;
+        if (newDeduction < 0) newDeduction = 0;
+
+        const { error } = await db
+            .from('penalties')
+            .update({
+                penalty_type_id: parseInt(opt.value),
+                penalty_type_name: typeName,
+                penalty_percent: isReset ? 100 : percentPerCount,
+                xp_deducted: newDeduction,
+                count: isReset ? 1 : count,
+                note,
+                modified_at: getNowKST(),
+                modified_by: currentProfile.id
+            })
+            .eq('id', penaltyId);
+
+        if (error) throw error;
+
+        await recalculateAndSaveXP(selectedStudentId);
+        closeEditPenaltyModal();
+        await loadStudentEntries(selectedStudentId, selectedStudentName);
+        await loadStudents();
+    } catch (err) {
+        console.error('Penalty edit failed:', err);
+        alert('수정 처리 중 오류가 발생했습니다. 데이터를 보호하기 위해 변경을 취소합니다.');
+    } finally {
+        isSavingPenaltyEdit = false;
+        if (saveBtn) saveBtn.disabled = false;
     }
 }
 

@@ -383,7 +383,9 @@ async function doSaveEdit() {
 
     const auditFields = { modified_at: getNowKST(), modified_by: currentProfile.id };
 
-    // Update entry
+    // Update entry - status is left untouched so an edit never silently
+    // approves the entry; it stays pending until the teacher explicitly
+    // approves it (individually or via "전체 승인")
     await db
         .from('daily_entries')
         .update({
@@ -391,7 +393,6 @@ async function doSaveEdit() {
             greetings: greetings,
             assignments: assignments,
             writing_type: writing,
-            status: 'approved',
             ...auditFields
         })
         .eq('id', entryId);
@@ -442,13 +443,15 @@ async function doSaveEdit() {
             entry_id: entryId,
             title_name: name,
             date_earned: date,
-            status: 'approved',
+            status: 'pending',
             ...auditFields
         }));
         await db.from('titles').insert(titleRecords);
     }
 
-    // Recalculate XP (also checks milestones internally)
+    // Recalculate XP (also checks milestones internally) - a no-op for
+    // total_xp while the entry is still pending, but keeps things in sync
+    // in case status ever ends up otherwise
     if (editEntryData) {
         await recalculateAndSaveXP(editEntryData.student_id);
     }

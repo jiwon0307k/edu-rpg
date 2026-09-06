@@ -67,6 +67,8 @@ async function loadProgressTable() {
     const tbody = document.getElementById('xp-table-body');
     tbody.innerHTML = '';
 
+    renderTodayEditBanner((entries || []).find(e => e.status === 'pending' && e.date === getTodayISO()));
+
     const hasEntries = entries && entries.length > 0;
     const hasPenalties = penalties && penalties.length > 0;
 
@@ -345,4 +347,77 @@ function renderPendingXP(cumulativeXP, pendingXP) {
     badge.textContent = willLevelUp
         ? `✨ 승인 대기 중: +${pendingXP}% (승인 완료 시 Lv.${projectedLevel} ${projectedRemainder}% 달성 예정! 🎉)`
         : `⏳ 승인 대기 중: +${pendingXP}% (승인 완료 시 Lv.${projectedLevel} ${projectedRemainder}% 예정)`;
+}
+
+// --- Edit today's own pending entry (인사/과제/글쓰기만; stamps/titles are
+// left as originally submitted) ---
+let todayPendingEntry = null;
+
+function renderTodayEditBanner(entry) {
+    todayPendingEntry = entry || null;
+    const banner = document.getElementById('today-edit-banner');
+    if (banner) banner.style.display = todayPendingEntry ? 'flex' : 'none';
+}
+
+function openTodayEditModal() {
+    if (!todayPendingEntry) return;
+
+    document.getElementById('today-edit-greetings').checked = todayPendingEntry.greetings;
+    document.getElementById('today-edit-assignments').value = todayPendingEntry.assignments || 0;
+
+    const writingValue = todayPendingEntry.writing_type || 'none';
+    const writingRadio = document.querySelector(`input[name="today-edit-writing"][value="${writingValue}"]`);
+    if (writingRadio) writingRadio.checked = true;
+
+    document.getElementById('today-edit-modal').style.display = 'flex';
+}
+
+function closeTodayEditModal() {
+    document.getElementById('today-edit-modal').style.display = 'none';
+}
+
+let isSavingTodayEdit = false;
+
+async function saveTodayEntryEdit() {
+    if (!todayPendingEntry || isSavingTodayEdit) return;
+    isSavingTodayEdit = true;
+
+    const saveBtn = document.getElementById('today-edit-save-btn');
+    if (saveBtn) saveBtn.disabled = true;
+
+    try {
+        const greetings = document.getElementById('today-edit-greetings').checked;
+        const assignments = parseInt(document.getElementById('today-edit-assignments').value) || 0;
+        const writingInput = document.querySelector('input[name="today-edit-writing"]:checked');
+        const writing = writingInput ? writingInput.value : 'none';
+
+        // .eq('status', 'pending') double-checks the teacher hasn't approved
+        // it in the meantime; .single() then errors if that row is gone
+        const { error } = await db
+            .from('daily_entries')
+            .update({
+                greetings,
+                assignments,
+                writing_type: writing,
+                modified_at: getNowKST(),
+                modified_by: currentProfile.id
+            })
+            .eq('id', todayPendingEntry.id)
+            .eq('status', 'pending')
+            .select()
+            .single();
+
+        if (error) {
+            alert('수정할 수 없습니다. 이미 승인되었거나 수정 권한이 없습니다.');
+            closeTodayEditModal();
+            await loadProgressTable();
+            return;
+        }
+
+        closeTodayEditModal();
+        await loadProgressTable();
+    } finally {
+        isSavingTodayEdit = false;
+        if (saveBtn) saveBtn.disabled = false;
+    }
 }

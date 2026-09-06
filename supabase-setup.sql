@@ -292,6 +292,16 @@ ALTER TABLE app_settings ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "app_settings_select" ON app_settings FOR SELECT USING (true);
 CREATE POLICY "app_settings_update" ON app_settings FOR UPDATE USING (is_admin());
 
+-- 1h. Let a student edit their own daily_entries while still pending -- RUN THIS NOW (not yet applied)
+-- (existing "entries_update" policy only allows admin; this adds a second
+-- permissive policy so a student can fix their own submission before the
+-- teacher approves it, but never touch anyone else's row or flip status
+-- to 'approved' themselves - both USING and WITH CHECK re-verify status)
+CREATE POLICY "entries_update_own_pending" ON daily_entries
+    FOR UPDATE
+    USING (student_id = auth.uid() AND status = 'pending')
+    WITH CHECK (student_id = auth.uid() AND status = 'pending');
+
 ALTER TABLE daily_entries ADD COLUMN IF NOT EXISTS is_double_day BOOLEAN NOT NULL DEFAULT false;
 
 -- ============================================
