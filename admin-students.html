@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>경험치 통장 - 학생 관리</title>
-    <link rel="stylesheet" href="css/style.css?v=20260906_10">
+    <link rel="stylesheet" href="css/style.css?v=20260906_11">
     <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
 </head>
 <body>
@@ -166,15 +166,15 @@
                     <input type="date" id="batch-date">
                 </div>
                 <div class="form-group">
-                    <label>전원 인사</label>
-                    <label class="checkbox-label"><input type="checkbox" id="batch-master-greetings" onchange="applyMasterToAllRows()"><span>전원 했어요</span></label>
+                    <label>인사</label>
+                    <label class="checkbox-label" id="batch-master-greetings-label"><input type="checkbox" id="batch-master-greetings" onchange="applyMasterToAllRows()"><span>했어요</span></label>
                 </div>
                 <div class="form-group">
-                    <label>전원 과제</label>
+                    <label>과제</label>
                     <input type="number" id="batch-master-assignments" min="0" max="20" value="0" class="input-small" oninput="applyMasterToAllRows()">
                 </div>
                 <div class="form-group">
-                    <label>전원 글쓰기</label>
+                    <label>글쓰기</label>
                     <select id="batch-master-writing" onchange="applyMasterToAllRows()">
                         <option value="none">없음</option>
                         <option value="5%">감사 일기 (5%)</option>
@@ -187,12 +187,11 @@
                 <table class="xp-table batch-table">
                     <thead>
                         <tr>
-                            <th>#</th>
                             <th>이름</th>
                             <th>인사</th>
                             <th>과제</th>
-                            <th>글쓰기</th>
-                            <th>예외</th>
+                            <th style="min-width:120px;">글쓰기</th>
+                            <th style="min-width:210px;">예외</th>
                         </tr>
                     </thead>
                     <tbody id="batch-student-rows"></tbody>
@@ -209,14 +208,14 @@
     <div id="toast-container"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.100.1"></script>
-    <script src="js/supabase-config.js?v=20260906_10"></script>
-    <script src="js/auth.js?v=20260906_10"></script>
-    <script src="js/notifications.js?v=20260906_10"></script>
-    <script src="js/xp-service.js?v=20260906_10"></script>
-    <script src="js/date-util.js?v=20260906_10"></script>
-    <script src="js/stamp-groups.js?v=20260906_10"></script>
-    <script src="js/double-day.js?v=20260906_10"></script>
-    <script src="js/admin-batch-entry.js?v=20260906_10"></script>
-    <script src="js/admin-students.js?v=20260906_10"></script>
+    <script src="js/supabase-config.js?v=20260906_11"></script>
+    <script src="js/auth.js?v=20260906_11"></script>
+    <script src="js/notifications.js?v=20260906_11"></script>
+    <script src="js/xp-service.js?v=20260906_11"></script>
+    <script src="js/date-util.js?v=20260906_11"></script>
+    <script src="js/stamp-groups.js?v=20260906_11"></script>
+    <script src="js/double-day.js?v=20260906_11"></script>
+    <script src="js/admin-batch-entry.js?v=20260906_11"></script>
+    <script src="js/admin-students.js?v=20260906_11"></script>
 </body>
 </html>

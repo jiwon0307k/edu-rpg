@@ -895,6 +895,59 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     margin-bottom: 0;
 }
 
+#batch-master-greetings-label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    padding-left: 12px;
+    height: 38px;
+    box-sizing: border-box;
+}
+
+#batch-date,
+#batch-master-assignments {
+    height: 38px;
+    box-sizing: border-box;
+}
+
+/* Selects need appearance:none so Safari respects the custom background
+   instead of falling back to the native OS control look */
+#batch-master-writing,
+.batch-row-writing {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-color: var(--bg);
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath fill='%233E2E1E' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 10px 7px;
+    border: 1px solid var(--border);
+    color: var(--text);
+    box-sizing: border-box;
+}
+
+#batch-master-writing {
+    height: 38px;
+    padding: 0 28px 0 14px;
+    border-radius: 6px;
+}
+
+.batch-row-writing {
+    height: 32px;
+    min-width: 100px;
+    padding: 0 24px 0 8px;
+    border-radius: 4px;
+    background-position: right 6px center;
+    font-size: 0.9rem;
+}
+
+.batch-table .batch-row-assignments {
+    height: 32px;
+    box-sizing: border-box;
+}
+
 .batch-table-wrap {
     max-height: 50vh;
     overflow-y: auto;

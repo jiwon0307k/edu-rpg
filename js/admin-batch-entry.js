@@ -34,16 +34,15 @@ function renderBatchStudentRows() {
     tbody.innerHTML = '';
 
     if (batchStudentsCache.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">등록된 학생이 없습니다.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">등록된 학생이 없습니다.</td></tr>';
         return;
     }
 
-    batchStudentsCache.forEach((s, idx) => {
+    batchStudentsCache.forEach(s => {
         const row = document.createElement('tr');
         row.dataset.studentId = s.id;
         row.dataset.studentName = s.name;
         row.innerHTML = `
-            <td>${idx + 1}</td>
             <td>${s.name}</td>
             <td><input type="checkbox" class="batch-row-greetings"></td>
             <td><input type="number" class="batch-row-assignments input-small" min="0" max="20" value="0"></td>
@@ -56,10 +55,10 @@ function renderBatchStudentRows() {
             </td>
             <td>
                 <div class="batch-row-actions">
-                    <button type="button" class="btn-batch-exc" onclick="toggleBatchException('${s.id}', 'stamp')">+도장</button>
-                    <button type="button" class="btn-batch-exc" onclick="toggleBatchException('${s.id}', 'title')">+칭호</button>
-                    <button type="button" class="btn-batch-exc" onclick="toggleBatchException('${s.id}', 'bonus')">+보너스</button>
-                    <button type="button" class="btn-batch-exc btn-batch-exc-danger" onclick="toggleBatchException('${s.id}', 'penalty')">-감점</button>
+                    <button type="button" class="btn-batch-exc" onclick="toggleBatchException('${s.id}', 'stamp')">도장</button>
+                    <button type="button" class="btn-batch-exc" onclick="toggleBatchException('${s.id}', 'title')">칭호</button>
+                    <button type="button" class="btn-batch-exc" onclick="toggleBatchException('${s.id}', 'bonus')">보너스</button>
+                    <button type="button" class="btn-batch-exc btn-batch-exc-danger" onclick="toggleBatchException('${s.id}', 'penalty')">감점</button>
                 </div>
             </td>
         `;
@@ -70,7 +69,7 @@ function renderBatchStudentRows() {
         excRow.id = `batch-exc-${s.id}`;
         excRow.style.display = 'none';
         excRow.innerHTML = `
-            <td colspan="6">
+            <td colspan="5">
                 <div class="batch-exception-panel">
                     <div class="batch-exc-section" id="batch-stamp-section-${s.id}" style="display:none;">
                         <div class="batch-exc-section-label">🏷️ 가치 도장 추가</div>
