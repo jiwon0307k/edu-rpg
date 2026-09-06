@@ -1135,6 +1135,29 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     margin-bottom: 20px;
 }
 
+/* Keep 날짜/인사/과제/글쓰기 labels and inputs at a uniform height even
+   though some labels carry a 🔥 emoji that would otherwise grow taller */
+.admin-entry-col1 {
+    margin-bottom: 14px;
+}
+
+.admin-entry-col1 > label:first-child {
+    display: flex;
+    align-items: center;
+    min-height: 24px;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.admin-entry-col1 #admin-entry-date,
+.admin-entry-col1 #admin-greetings-label,
+.admin-entry-col1 #admin-assignments,
+.admin-entry-col1 #admin-writing {
+    height: 38px;
+    box-sizing: border-box;
+    vertical-align: middle;
+}
+
 .notif-empty {
     padding: 24px 16px;
     text-align: center;
