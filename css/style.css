@@ -1229,8 +1229,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         justify-content: space-between;
         align-items: center;
         padding: 4px 6px;
-        font-size: 13px;
-        letter-spacing: -0.5px;
+        font-size: 12px;
+        letter-spacing: -0.6px;
         gap: 4px;
     }
 
@@ -1243,10 +1243,10 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     }
 
     .stamp-count-item .stamp-count {
-        width: 44px !important;
-        min-width: 44px;
-        padding: 2px 2px;
-        font-size: 13px;
+        width: 42px !important;
+        min-width: 42px;
+        padding: 2px;
+        font-size: 12px;
     }
 }
 
