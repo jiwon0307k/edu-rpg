@@ -1491,6 +1491,61 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     opacity: 0.4;
 }
 
+/* === Collected Stamps Showcase ("모은 도장") === */
+.stamp-showcase {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.stamp-showcase-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 30px;
+    margin: 4px;
+    padding: 0 12px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    box-sizing: border-box;
+}
+
+.stamp-showcase-chip.tier-0 {
+    background: #f8f6f0;
+    color: #a89f91;
+    opacity: 0.45;
+    border: 1px dashed #dcd5c9;
+}
+
+.stamp-showcase-chip.tier-1 {
+    background: #fff9db;
+    color: #73510d;
+    border: 1px solid #f1d27a;
+}
+
+.stamp-showcase-chip.tier-2 {
+    background: #ffe58f;
+    color: #613b00;
+    font-weight: 700;
+    border: 1px solid #d4953c;
+}
+
+.stamp-showcase-chip.tier-3 {
+    background: #ffd666;
+    color: #402300;
+    font-weight: 700;
+    border: 1px solid #ad6800;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.stamp-showcase-chip.tier-4 {
+    background: #d48806;
+    color: #ffffff;
+    font-weight: 800;
+    border: 1px solid #874d00;
+    box-shadow: 0 2px 4px rgba(212, 136, 6, 0.25);
+}
+
 /* === Multi-Penalty Row === */
 .penalty-row-item {
     background: var(--bg);

@@ -69,6 +69,8 @@ async function loadProgressTable() {
 
     renderTodayEditBanner((entries || []).find(e => e.status === 'pending' && e.date === getTodayISO()));
 
+    renderStampShowcase(document.getElementById('stamp-showcase'), allValueTypes, entries, stamps);
+
     const hasEntries = entries && entries.length > 0;
     const hasPenalties = penalties && penalties.length > 0;
 

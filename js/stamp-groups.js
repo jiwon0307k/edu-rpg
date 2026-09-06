@@ -65,3 +65,40 @@ function renderStampGroups(container, valueTypes, buildItemHTML) {
         });
     });
 }
+
+// --- Collected Stamps Showcase ("모은 도장") ---
+// One chip per value type, showing its lifetime approved-only stamp count
+// and a color tier based on that count. Counts only stamps whose parent
+// daily_entries row is 'approved' - pending/rejected stamps never show up
+// here, so there's no ghost data before a teacher approves anything.
+// Callers pass in entries/stamps they've already fetched for the page (no
+// extra query here), so re-running this after any load/recalculate call
+// keeps it in sync with every edit/delete/approve.
+function stampShowcaseTier(count) {
+    if (count >= 30) return 'tier-4';
+    if (count >= 20) return 'tier-3';
+    if (count >= 10) return 'tier-2';
+    if (count >= 1) return 'tier-1';
+    return 'tier-0';
+}
+
+function renderStampShowcase(container, valueTypes, entries, stamps) {
+    if (!container) return;
+
+    const approvedEntryIds = new Set(
+        (entries || []).filter(e => e.status === 'approved').map(e => e.id)
+    );
+
+    const countByTypeId = {};
+    (stamps || []).forEach(s => {
+        if (!approvedEntryIds.has(s.entry_id)) return;
+        countByTypeId[s.value_type_id] = (countByTypeId[s.value_type_id] || 0) + (s.count || 1);
+    });
+
+    const ordered = orderValueTypesForDisplay(valueTypes || []);
+
+    container.innerHTML = ordered.map(vt => {
+        const count = countByTypeId[vt.id] || 0;
+        return `<span class="stamp-showcase-chip ${stampShowcaseTier(count)}">${vt.name} ${count}</span>`;
+    }).join('');
+}

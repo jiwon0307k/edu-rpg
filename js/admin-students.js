@@ -218,6 +218,8 @@ async function loadStudentEntries(studentId, studentName) {
     const tbody = document.getElementById('detail-table-body');
     tbody.innerHTML = '';
 
+    renderStampShowcase(document.getElementById('detail-stamp-showcase'), allValueTypes, entries, stamps);
+
     const hasEntries = entries && entries.length > 0;
     const hasPenalties = penalties && penalties.length > 0;
 
