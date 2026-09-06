@@ -1382,6 +1382,23 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     align-items: center;
 }
 
+/* === Row Delete Button === */
+.btn-row-delete {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.95rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    line-height: 1;
+    transition: background 0.2s, transform 0.15s;
+}
+
+.btn-row-delete:hover {
+    background: rgba(230, 103, 96, 0.15);
+    transform: scale(1.1);
+}
+
 /* === Penalty === */
 .penalty-row { background: rgba(230, 103, 96, 0.08); }
 .penalty-row:hover { background: rgba(230, 103, 96, 0.12); }

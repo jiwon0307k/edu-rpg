@@ -212,7 +212,7 @@ async function loadStudentEntries(studentId, studentName) {
     orderedValueTypes.forEach(vt => {
         headerHTML += `<th${!vt.active ? ' class="inactive-col"' : ''}>${vt.name}</th>`;
     });
-    headerHTML += '<th>과제</th><th>글쓰기</th><th style="min-width:120px;">칭호</th><th style="min-width:120px;">보너스</th><th>총 경험치</th><th>누적 경험치</th></tr>';
+    headerHTML += '<th>과제</th><th>글쓰기</th><th style="min-width:120px;">칭호</th><th style="min-width:120px;">보너스</th><th>총 경험치</th><th>누적 경험치</th><th>관리</th></tr>';
     thead.innerHTML = headerHTML;
 
     const tbody = document.getElementById('detail-table-body');
@@ -222,7 +222,7 @@ async function loadStudentEntries(studentId, studentName) {
     const hasPenalties = penalties && penalties.length > 0;
 
     if (!hasEntries && !hasPenalties) {
-        tbody.innerHTML = `<tr><td colspan="${midCols + 5}" class="text-center text-muted">기록이 없습니다.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="${midCols + 6}" class="text-center text-muted">아직 등록된 기록이 없습니다.</td></tr>`;
         document.getElementById('detail-level-badge').textContent = 'Lv.1';
         document.getElementById('detail-xp-text').textContent = '0%';
         return;
@@ -305,6 +305,7 @@ async function loadStudentEntries(studentId, studentName) {
 
             cells += `<td>${dailyXP}%</td>`;
             cells += `<td>${cumulativeXP}%</td>`;
+            cells += `<td><button type="button" class="btn-row-delete" title="이 기록 삭제" onclick="deleteEntryRow(${entry.id})">🗑️</button></td>`;
 
             row.innerHTML = cells;
             // Newest entries first, while cumulative XP is still computed oldest-to-newest above
@@ -326,6 +327,7 @@ async function loadStudentEntries(studentId, studentName) {
             if (cumulativeXP < 0) cumulativeXP = 0;
             cells += `<td>-</td>`;
             cells += `<td>${cumulativeXP}%</td>`;
+            cells += `<td><button type="button" class="btn-row-delete" title="이 감점 삭제" onclick="deletePenaltyRow(${p.id})">🗑️</button></td>`;
 
             row.innerHTML = cells;
             tbody.insertBefore(row, tbody.firstChild);
@@ -335,6 +337,57 @@ async function loadStudentEntries(studentId, studentName) {
     const { level, remainder } = calculateLevel(cumulativeXP);
     document.getElementById('detail-level-badge').textContent = 'Lv.' + level;
     document.getElementById('detail-xp-text').textContent = remainder + '%';
+}
+
+// --- Delete a single record (source-of-truth recalculation, no subtraction math) ---
+let isDeletingRecord = false;
+
+async function deleteEntryRow(entryId) {
+    if (!confirm('이 기록을 삭제하시겠습니까? 누적 경험치와 레벨이 원천 데이터를 기준으로 자동 재계산됩니다.')) return;
+
+    await deleteRecordAndRefresh(async () => {
+        // Clean up everything that hangs off this entry before the entry itself
+        await db.from('entry_value_stamps').delete().eq('entry_id', entryId);
+        await db.from('titles').delete().eq('entry_id', entryId);
+
+        const { error } = await db.from('daily_entries').delete().eq('id', entryId);
+        if (error) throw error;
+    });
+}
+
+async function deletePenaltyRow(penaltyId) {
+    if (!confirm('이 감점 기록을 삭제하시겠습니까? 누적 경험치와 레벨이 원천 데이터를 기준으로 자동 재계산됩니다.')) return;
+
+    await deleteRecordAndRefresh(async () => {
+        const { error } = await db.from('penalties').delete().eq('id', penaltyId);
+        if (error) throw error;
+    });
+}
+
+// Shared delete pipeline: perform the DB delete, then rebuild everything from
+// the database from scratch (recalculateAndSaveXP re-sums ALL remaining
+// daily_entries/stamps/titles/penalties - never a naive total_xp subtraction),
+// then re-render the detail table and student list from that fresh state.
+// Re-rendering the whole table (instead of just removing one <tr>) is
+// deliberate: every row's "누적 경험치" column is a running total computed
+// from the rows before it, so surgically deleting a single row would leave
+// every other row showing a stale cumulative number - exactly the kind of
+// data distortion this feature exists to prevent.
+async function deleteRecordAndRefresh(performDelete) {
+    if (!selectedStudentId || isDeletingRecord) return;
+    isDeletingRecord = true;
+
+    try {
+        await performDelete();
+        await recalculateAndSaveXP(selectedStudentId);
+        await loadStudentEntries(selectedStudentId, selectedStudentName);
+        await loadStudents();
+    } catch (err) {
+        console.error('Delete failed:', err);
+        alert('삭제 처리 중 오류가 발생했습니다. 데이터를 보호하기 위해 변경을 취소합니다.');
+    } finally {
+        isDeletingRecord = false;
+    }
 }
 
 // --- Admin Add Entry ---
