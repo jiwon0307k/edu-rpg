@@ -208,17 +208,18 @@ async function loadStudentEntries(studentId, studentName) {
     const thead = document.getElementById('detail-table-head');
     const orderedValueTypes = orderValueTypesForDisplay(allValueTypes);
     const midCols = allValueTypes.length + 5; // insa + stamps + assignments + writing + titles + bonus
-    let headerHTML = '<tr><th style="min-width:120px;">날짜</th><th>총 경험치</th><th>상태</th><th>인사</th>';
+    let headerHTML = '<th style="min-width:120px;">날짜</th><th>총 경험치</th><th>상태</th><th>인사</th>';
     orderedValueTypes.forEach(vt => {
         headerHTML += `<th${!vt.active ? ' class="inactive-col"' : ''}>${vt.name}</th>`;
     });
-    headerHTML += '<th>과제</th><th>글쓰기</th><th style="min-width:120px;">칭호</th><th style="min-width:120px;">보너스</th><th>총 경험치</th><th>누적 경험치</th><th>관리</th></tr>';
-    thead.innerHTML = headerHTML;
+    headerHTML += '<th>과제</th><th>글쓰기</th><th style="min-width:120px;">칭호</th><th style="min-width:120px;">보너스</th><th>총 경험치</th><th>누적 경험치</th><th>관리</th>';
+
+    // 7 trailing columns after the value-type columns: 과제/글쓰기/칭호/보너스/총경험치/누적경험치/관리
+    const summaryRowHTML = buildStampSummaryRow(orderedValueTypes, entries, stamps, 7);
+    thead.innerHTML = summaryRowHTML + '<tr>' + headerHTML + '</tr>';
 
     const tbody = document.getElementById('detail-table-body');
     tbody.innerHTML = '';
-
-    renderStampShowcase(document.getElementById('detail-stamp-showcase'), allValueTypes, entries, stamps);
 
     const hasEntries = entries && entries.length > 0;
     const hasPenalties = penalties && penalties.length > 0;

@@ -1491,46 +1491,57 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     opacity: 0.4;
 }
 
-/* === Collected Stamps Showcase ("모은 도장") === */
-.stamp-showcase {
-    display: flex;
-    flex-wrap: wrap;
+/* === Collected Stamps Summary Row ("모은 도장") ===
+   A floating badge row sitting directly above the real header row inside
+   the same <thead>, so it's part of the table itself and scrolls/aligns
+   column-for-column with the value-type <th>s below it and the data <td>s
+   further down - no separate element to ever drift out of sync. */
+.stamp-summary-row th {
+    background: transparent;
+    border-bottom: none;
+    padding: 2px 14px 4px;
 }
 
-.stamp-showcase-chip {
+.stamp-summary-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.stamp-summary-badge {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    height: 30px;
-    margin: 4px;
-    padding: 0 12px;
-    border-radius: 999px;
-    font-size: 0.85rem;
-    white-space: nowrap;
+    min-width: 30px;
+    height: 24px;
+    padding: 0 4px;
+    border-radius: 6px;
+    font-size: 12px;
     box-sizing: border-box;
 }
 
-.stamp-showcase-chip.tier-0 {
+.stamp-summary-badge.tier-0 {
     background: #f8f6f0;
     color: #a89f91;
-    opacity: 0.45;
+    opacity: 0.4;
     border: 1px dashed #dcd5c9;
 }
 
-.stamp-showcase-chip.tier-1 {
+.stamp-summary-badge.tier-1 {
     background: #fff9db;
     color: #73510d;
     border: 1px solid #f1d27a;
 }
 
-.stamp-showcase-chip.tier-2 {
+.stamp-summary-badge.tier-2 {
     background: #ffe58f;
     color: #613b00;
     font-weight: 700;
     border: 1px solid #d4953c;
 }
 
-.stamp-showcase-chip.tier-3 {
+.stamp-summary-badge.tier-3 {
     background: #ffd666;
     color: #402300;
     font-weight: 700;
@@ -1538,7 +1549,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
 }
 
-.stamp-showcase-chip.tier-4 {
+.stamp-summary-badge.tier-4 {
     background: #d48806;
     color: #ffffff;
     font-weight: 800;

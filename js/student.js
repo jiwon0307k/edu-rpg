@@ -25,7 +25,6 @@ async function loadProgressTable() {
 
     // Build table header with dynamic value type columns
     const thead = document.getElementById('xp-table-head');
-    const headerRow = thead.querySelector('tr');
     const allValueTypes = valueTypes || [];
     const orderedValueTypes = orderValueTypesForDisplay(allValueTypes);
 
@@ -34,7 +33,6 @@ async function loadProgressTable() {
         headerHTML += `<th${!vt.active ? ' class="inactive-col"' : ''}>${vt.name}</th>`;
     });
     headerHTML += '<th>과제</th><th>글쓰기</th><th style="min-width:120px;">칭호</th><th style="min-width:120px;">보너스</th><th>총 경험치</th><th>누적 경험치</th>';
-    headerRow.innerHTML = headerHTML;
 
     // Load entries
     const { data: entries } = await db
@@ -69,7 +67,9 @@ async function loadProgressTable() {
 
     renderTodayEditBanner((entries || []).find(e => e.status === 'pending' && e.date === getTodayISO()));
 
-    renderStampShowcase(document.getElementById('stamp-showcase'), allValueTypes, entries, stamps);
+    // 6 trailing columns after the value-type columns: 과제/글쓰기/칭호/보너스/총경험치/누적경험치
+    const summaryRowHTML = buildStampSummaryRow(orderedValueTypes, entries, stamps, 6);
+    thead.innerHTML = summaryRowHTML + '<tr>' + headerHTML + '</tr>';
 
     const hasEntries = entries && entries.length > 0;
     const hasPenalties = penalties && penalties.length > 0;

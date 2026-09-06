@@ -66,14 +66,15 @@ function renderStampGroups(container, valueTypes, buildItemHTML) {
     });
 }
 
-// --- Collected Stamps Showcase ("모은 도장") ---
-// One chip per value type, showing its lifetime approved-only stamp count
-// and a color tier based on that count. Counts only stamps whose parent
-// daily_entries row is 'approved' - pending/rejected stamps never show up
-// here, so there's no ghost data before a teacher approves anything.
-// Callers pass in entries/stamps they've already fetched for the page (no
-// extra query here), so re-running this after any load/recalculate call
-// keeps it in sync with every edit/delete/approve.
+// --- Collected Stamps Summary Row ("모은 도장") ---
+// A floating <tr> of small count badges inserted directly above the real
+// header row so each badge sits column-aligned over its matching value-type
+// <th> (same 3-column life/study order as everywhere else). Counts only
+// stamps whose parent daily_entries row is 'approved' - pending/rejected
+// stamps never show up here, so there's no ghost data before a teacher
+// approves anything. Callers pass in entries/stamps they've already fetched
+// for the page (no extra query here), so re-running this after any
+// load/recalculate call keeps it in sync with every edit/delete/approve.
 function stampShowcaseTier(count) {
     if (count >= 30) return 'tier-4';
     if (count >= 20) return 'tier-3';
@@ -82,9 +83,14 @@ function stampShowcaseTier(count) {
     return 'tier-0';
 }
 
-function renderStampShowcase(container, valueTypes, entries, stamps) {
-    if (!container) return;
-
+// `orderedValueTypes` must be the same array (same order) used to build the
+// real header row, so each badge <th> lands directly above its column.
+// `leadingCount` covers the 날짜/총경험치/상태/인사 columns before the
+// value-type columns start (always 4); `trailingCount` covers whatever
+// columns follow (과제/글쓰기/칭호/보너스/총경험치/누적경험치[/관리]) -
+// both get empty, transparent <th> cells so only the value-type columns
+// carry a badge.
+function buildStampSummaryRow(orderedValueTypes, entries, stamps, trailingCount, leadingCount = 4) {
     const approvedEntryIds = new Set(
         (entries || []).filter(e => e.status === 'approved').map(e => e.id)
     );
@@ -95,10 +101,16 @@ function renderStampShowcase(container, valueTypes, entries, stamps) {
         countByTypeId[s.value_type_id] = (countByTypeId[s.value_type_id] || 0) + (s.count || 1);
     });
 
-    const ordered = orderValueTypesForDisplay(valueTypes || []);
+    let html = '<tr class="stamp-summary-row">';
+    html += '<th><span class="stamp-summary-label">🏅 모은 도장</span></th>';
+    for (let i = 1; i < leadingCount; i++) html += '<th></th>';
 
-    container.innerHTML = ordered.map(vt => {
+    orderedValueTypes.forEach(vt => {
         const count = countByTypeId[vt.id] || 0;
-        return `<span class="stamp-showcase-chip ${stampShowcaseTier(count)}">${vt.name} ${count}</span>`;
-    }).join('');
+        html += `<th><span class="stamp-summary-badge ${stampShowcaseTier(count)}">${count}</span></th>`;
+    });
+
+    for (let i = 0; i < trailingCount; i++) html += '<th></th>';
+    html += '</tr>';
+    return html;
 }
