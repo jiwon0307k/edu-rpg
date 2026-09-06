@@ -400,11 +400,28 @@ async function deleteRecordAndRefresh(performDelete) {
     }
 }
 
-// --- Edit a single record (entry: core fields only; stamps/titles are not
-// editable here - delete and re-add if those need to change) ---
+function addEditEntryTitleInput() {
+    const container = document.getElementById('edit-entry-title-inputs');
+    const count = container.querySelectorAll('.title-row').length;
+    if (count >= 5) {
+        alert('칭호는 최대 5개까지 입력할 수 있습니다.');
+        return;
+    }
+    const row = document.createElement('div');
+    row.className = 'title-row';
+    row.style.marginBottom = '6px';
+    row.innerHTML = '<input type="text" name="edit-entry-title-name" placeholder="칭호 이름 (없으면 비워두세요)" class="input-inline">';
+    container.appendChild(row);
+}
+
+// --- Edit a single record (core fields + bonus + stamps + titles, all
+// rebuilt from scratch on save so the row matches exactly what's shown) ---
+let editEntryOriginal = null;
+
 async function openEditEntryModal(entryId) {
     const { data: entry } = await db.from('daily_entries').select('*').eq('id', entryId).single();
     if (!entry) return;
+    editEntryOriginal = entry;
 
     document.getElementById('edit-entry-id').value = entry.id;
     document.getElementById('edit-entry-date-field').value = entry.date;
@@ -414,11 +431,55 @@ async function openEditEntryModal(entryId) {
     document.getElementById('edit-entry-bonus-points').value = entry.bonus_points || 0;
     document.getElementById('edit-entry-bonus-reason').value = entry.bonus_reason || '';
 
+    // Use this entry's own is_double_day flag (not the live toggle) so
+    // editing preserves whatever multiplier applied at original submission
+    const editMult = xpMultiplier(entry.is_double_day);
+
+    const [{ data: stamps }, { data: titles }] = await Promise.all([
+        db.from('entry_value_stamps').select('*').eq('entry_id', entryId),
+        db.from('titles').select('*').eq('entry_id', entryId)
+    ]);
+
+    const container = document.getElementById('edit-entry-value-stamps');
+    renderStampGroups(container, allValueTypes.filter(vt => vt.active), vt => {
+        const existingStamp = (stamps || []).find(s => s.value_type_id === vt.id);
+        const checked = !!existingStamp;
+        const count = existingStamp ? (existingStamp.count || 1) : 1;
+        return `
+            <label class="checkbox-label">
+                <input type="checkbox" name="edit-entry-vt" value="${vt.id}" data-points="${vt.points * editMult}" data-name="${vt.name}" ${checked ? 'checked' : ''}
+                    onchange="this.closest('.stamp-count-item').querySelector('.stamp-count').disabled = !this.checked;">
+                <span>${vt.name}</span>
+            </label>
+            <input type="number" class="stamp-count input-small" min="1" max="20" value="${count}" ${checked ? '' : 'disabled'}
+                data-vt-id="${vt.id}">
+        `;
+    });
+
+    const titleContainer = document.getElementById('edit-entry-title-inputs');
+    titleContainer.innerHTML = '';
+    if (titles && titles.length > 0) {
+        titles.forEach(t => {
+            const row = document.createElement('div');
+            row.className = 'title-row';
+            row.style.marginBottom = '6px';
+            row.innerHTML = `<input type="text" name="edit-entry-title-name" placeholder="칭호 이름 (없으면 비워두세요)" class="input-inline" value="${t.title_name}">`;
+            titleContainer.appendChild(row);
+        });
+    } else {
+        const row = document.createElement('div');
+        row.className = 'title-row';
+        row.style.marginBottom = '6px';
+        row.innerHTML = '<input type="text" name="edit-entry-title-name" placeholder="칭호 이름 (없으면 비워두세요)" class="input-inline">';
+        titleContainer.appendChild(row);
+    }
+
     document.getElementById('edit-entry-modal').style.display = 'flex';
 }
 
 function closeEditEntryModal() {
     document.getElementById('edit-entry-modal').style.display = 'none';
+    editEntryOriginal = null;
 }
 
 let isSavingEntryEdit = false;
@@ -439,6 +500,8 @@ async function saveEntryRowEdit() {
         const bonusPoints = parseInt(document.getElementById('edit-entry-bonus-points').value) || 0;
         const bonusReason = document.getElementById('edit-entry-bonus-reason').value.trim();
 
+        const auditFields = { modified_at: getNowKST(), modified_by: currentProfile.id };
+
         const { error } = await db
             .from('daily_entries')
             .update({
@@ -448,16 +511,61 @@ async function saveEntryRowEdit() {
                 writing_type: writing,
                 bonus_points: bonusPoints,
                 bonus_reason: bonusReason,
-                modified_at: getNowKST(),
-                modified_by: currentProfile.id
+                ...auditFields
             })
             .eq('id', entryId);
 
         if (error) throw error;
 
+        // Rebuild stamps: delete old, insert new
+        await db.from('entry_value_stamps').delete().eq('entry_id', entryId);
+
+        const checkedStamps = document.querySelectorAll('input[name="edit-entry-vt"]:checked');
+        if (checkedStamps.length > 0) {
+            const stampRecords = Array.from(checkedStamps).map(cb => {
+                const countInput = cb.closest('.stamp-count-item').querySelector('.stamp-count');
+                const count = parseInt(countInput.value) || 1;
+                return {
+                    entry_id: entryId,
+                    value_type_id: parseInt(cb.value),
+                    date: date,
+                    student_name: selectedStudentName,
+                    value_name: cb.dataset.name,
+                    points: parseInt(cb.dataset.points),
+                    count: count,
+                    ...auditFields
+                };
+            });
+            await db.from('entry_value_stamps').insert(stampRecords);
+        }
+
+        // Rebuild titles: delete old, insert new from edit inputs
+        await db.from('titles').delete().eq('entry_id', entryId);
+
+        const titleInputs = document.querySelectorAll('#edit-entry-title-inputs input[name="edit-entry-title-name"]');
+        const titleNames = Array.from(titleInputs)
+            .map(input => input.value.trim())
+            .filter(name => name.length > 0);
+
+        if (titleNames.length > 0) {
+            const titleRecords = titleNames.map(name => ({
+                student_id: selectedStudentId,
+                entry_id: entryId,
+                title_name: name,
+                date_earned: date,
+                status: editEntryOriginal ? editEntryOriginal.status : 'approved',
+                ...auditFields
+            }));
+            await db.from('titles').insert(titleRecords);
+        }
+
         // Source-of-truth recalculation, then rebuild the whole table so
         // every row's running "누적 경험치" stays consistent
         await recalculateAndSaveXP(selectedStudentId);
+        // Editing stamps can drop an approved stamp count back below a
+        // milestone the student was already notified about - same risk as
+        // deleting a record, so clear any now-stale notification
+        await reconcileMilestoneNotifications(selectedStudentId);
         closeEditEntryModal();
         await loadStudentEntries(selectedStudentId, selectedStudentName);
         await loadStudents();

@@ -297,6 +297,8 @@ async function openEditModal(entryId) {
     document.getElementById('edit-greetings').checked = entry.greetings;
     document.getElementById('edit-assignments').value = entry.assignments || 0;
     document.getElementById('edit-writing').value = entry.writing_type;
+    document.getElementById('edit-bonus-points').value = entry.bonus_points || 0;
+    document.getElementById('edit-bonus-reason').value = entry.bonus_reason || '';
 
     // Load stamps for this entry
     const { data: stamps } = await db
@@ -380,6 +382,8 @@ async function doSaveEdit() {
     const greetings = document.getElementById('edit-greetings').checked;
     const assignments = parseInt(document.getElementById('edit-assignments').value) || 0;
     const writing = document.getElementById('edit-writing').value;
+    const bonusPoints = parseInt(document.getElementById('edit-bonus-points').value) || 0;
+    const bonusReason = document.getElementById('edit-bonus-reason').value.trim();
 
     const auditFields = { modified_at: getNowKST(), modified_by: currentProfile.id };
 
@@ -393,6 +397,8 @@ async function doSaveEdit() {
             greetings: greetings,
             assignments: assignments,
             writing_type: writing,
+            bonus_points: bonusPoints,
+            bonus_reason: bonusReason,
             ...auditFields
         })
         .eq('id', entryId);

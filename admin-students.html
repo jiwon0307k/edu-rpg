@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>경험치 통장 - 학생 관리</title>
-    <link rel="stylesheet" href="css/style.css?v=20260906_ui2">
+    <link rel="stylesheet" href="css/style.css?v=20260906_ui3">
     <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
 </head>
 <body>
@@ -211,19 +211,19 @@
             <h3>✏️ 기록 수정</h3>
             <input type="hidden" id="edit-entry-id">
             <div class="form-row">
-                <div class="form-group edit-entry-col">
+                <div class="form-group admin-entry-col1">
                     <label>날짜</label>
                     <input type="date" id="edit-entry-date-field">
                 </div>
-                <div class="form-group edit-entry-col">
+                <div class="form-group admin-entry-col1">
                     <label>인사</label>
                     <label class="checkbox-label" id="edit-entry-greetings-label"><input type="checkbox" id="edit-entry-greetings"><span>했어요</span></label>
                 </div>
-                <div class="form-group edit-entry-col">
+                <div class="form-group admin-entry-col1">
                     <label>과제 개수</label>
                     <input type="number" id="edit-entry-assignments" min="0" max="20" value="0" class="input-small">
                 </div>
-                <div class="form-group edit-entry-col">
+                <div class="form-group admin-entry-col1">
                     <label>글쓰기</label>
                     <select id="edit-entry-writing">
                         <option value="none">없음</option>
@@ -232,15 +232,29 @@
                     </select>
                 </div>
             </div>
-            <div class="form-group edit-entry-col">
+            <div class="form-group admin-entry-col1" id="edit-entry-bonus-group">
                 <label>보너스</label>
                 <div style="display:flex;gap:8px;align-items:center;">
-                    <input type="number" id="edit-entry-bonus-points" min="0" value="0" class="input-small">
+                    <input type="number" id="edit-entry-bonus-points" min="0" max="100" value="0">
                     <span>%</span>
-                    <input type="text" id="edit-entry-bonus-reason" placeholder="사유" class="input-inline">
+                    <input type="text" id="edit-entry-bonus-reason" placeholder="사유 입력">
                 </div>
             </div>
-            <p class="text-muted edit-entry-hint" style="margin-left:0;">※ 가치 도장·칭호는 여기서 수정할 수 없습니다. 필요하면 기록을 삭제한 뒤 다시 추가해 주세요.</p>
+            <div class="form-group">
+                <label>가치 도장 (각 5%)</label>
+                <div id="edit-entry-value-stamps"></div>
+            </div>
+            <div class="form-section">
+                <h4>칭호 (각 20%)</h4>
+                <div id="edit-entry-titles-section">
+                    <div id="edit-entry-title-inputs">
+                        <div class="title-row" style="margin-bottom: 6px;">
+                            <input type="text" name="edit-entry-title-name" placeholder="칭호 이름 (없으면 비워두세요)" class="input-inline">
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-small btn-secondary" onclick="addEditEntryTitleInput()" style="margin-top: 6px;">+ 칭호 추가</button>
+                </div>
+            </div>
             <div class="form-actions">
                 <button class="btn btn-primary" id="edit-entry-save-btn" onclick="saveEntryRowEdit()">저장</button>
                 <button class="btn btn-secondary" onclick="closeEditEntryModal()">취소</button>
@@ -277,14 +291,14 @@
     <div id="toast-container"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.100.1"></script>
-    <script src="js/supabase-config.js?v=20260906_ui2"></script>
-    <script src="js/auth.js?v=20260906_ui2"></script>
-    <script src="js/notifications.js?v=20260906_ui2"></script>
-    <script src="js/xp-service.js?v=20260906_ui2"></script>
-    <script src="js/date-util.js?v=20260906_ui2"></script>
-    <script src="js/stamp-groups.js?v=20260906_ui2"></script>
-    <script src="js/double-day.js?v=20260906_ui2"></script>
-    <script src="js/admin-batch-entry.js?v=20260906_ui2"></script>
-    <script src="js/admin-students.js?v=20260906_ui2"></script>
+    <script src="js/supabase-config.js?v=20260906_ui3"></script>
+    <script src="js/auth.js?v=20260906_ui3"></script>
+    <script src="js/notifications.js?v=20260906_ui3"></script>
+    <script src="js/xp-service.js?v=20260906_ui3"></script>
+    <script src="js/date-util.js?v=20260906_ui3"></script>
+    <script src="js/stamp-groups.js?v=20260906_ui3"></script>
+    <script src="js/double-day.js?v=20260906_ui3"></script>
+    <script src="js/admin-batch-entry.js?v=20260906_ui3"></script>
+    <script src="js/admin-students.js?v=20260906_ui3"></script>
 </body>
 </html>

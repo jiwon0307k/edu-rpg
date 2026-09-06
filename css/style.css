@@ -1214,7 +1214,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 #admin-greetings-label,
-#edit-greetings-label {
+#edit-greetings-label,
+#edit-entry-greetings-label {
     display: inline-flex;
     align-items: center;
     justify-content: flex-start;
@@ -1223,7 +1224,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 #admin-greetings-label input[type="checkbox"],
-#edit-greetings-label input[type="checkbox"] {
+#edit-greetings-label input[type="checkbox"],
+#edit-entry-greetings-label input[type="checkbox"] {
     margin-right: 8px;
 }
 
@@ -1252,7 +1254,11 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .admin-entry-col1 #edit-date,
 .admin-entry-col1 #edit-greetings-label,
 .admin-entry-col1 #edit-assignments,
-.admin-entry-col1 #edit-writing {
+.admin-entry-col1 #edit-writing,
+.admin-entry-col1 #edit-entry-date-field,
+.admin-entry-col1 #edit-entry-greetings-label,
+.admin-entry-col1 #edit-entry-assignments,
+.admin-entry-col1 #edit-entry-writing {
     height: 40px;
     box-sizing: border-box;
     vertical-align: middle;
@@ -1261,7 +1267,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 /* Butter-theme dropdown look shared with the batch-entry selects, applied
    here too so 글쓰기 doesn't fall back to a dull native <select> chrome */
 #admin-writing,
-#edit-writing {
+#edit-writing,
+#edit-entry-writing {
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -1276,45 +1283,31 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     padding: 0 32px 0 14px;
 }
 
-/* === Edit Entry Modal (admin-students.html '기록 수정') — refined butter tone === */
-.edit-entry-col {
-    margin-bottom: 16px;
-}
-
-#edit-entry-date-field,
-#edit-entry-greetings-label,
-#edit-entry-assignments,
-#edit-entry-writing,
-#edit-entry-bonus-points,
-#edit-entry-bonus-reason {
+/* Bonus row (승인 대기 edit / 기록 수정 edit) — same butter tone/height as
+   the other admin-entry-col1 fields, sized per the 도장 개수 · 사유 spec */
+#edit-bonus-points,
+#edit-entry-bonus-points {
+    width: 80px;
     height: 40px;
     box-sizing: border-box;
-    background-color: #fffcf5;
-    border: 1.5px solid #ebd9b8;
+    text-align: center;
+    background: var(--bg);
+    border: 1px solid var(--border);
     border-radius: 8px;
-}
-
-#edit-entry-greetings-label {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 0 12px;
-}
-
-#edit-entry-writing {
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath fill='%233E2E1E' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 12px center;
-    background-size: 10px 7px;
-    padding: 0 32px 0 14px;
+    padding: 0 8px;
     color: var(--text);
 }
 
-.edit-entry-hint {
-    margin: 0 0 16px 0;
+#edit-bonus-reason,
+#edit-entry-bonus-reason {
+    flex: 1;
+    height: 40px;
+    box-sizing: border-box;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0 12px;
+    color: var(--text);
 }
 
 /* === Edit Penalty Modal (admin-students.html '감점 수정') — single-row butter grid === */

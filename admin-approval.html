@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>경험치 통장 - 승인 관리</title>
-    <link rel="stylesheet" href="css/style.css?v=20260906_ui2">
+    <link rel="stylesheet" href="css/style.css?v=20260906_ui3">
     <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
 </head>
 <body>
@@ -65,6 +65,14 @@
                         </select>
                     </div>
                 </div>
+                <div class="form-group admin-entry-col1" id="edit-bonus-group">
+                    <label>보너스</label>
+                    <div style="display:flex;gap:8px;align-items:center;">
+                        <input type="number" id="edit-bonus-points" min="0" max="100" value="0">
+                        <span>%</span>
+                        <input type="text" id="edit-bonus-reason" placeholder="사유 입력">
+                    </div>
+                </div>
                 <div class="form-group">
                     <label>가치 도장 (각 5%)</label>
                     <div id="edit-value-stamps"></div>
@@ -89,13 +97,13 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.100.1"></script>
-    <script src="js/supabase-config.js?v=20260906_ui2"></script>
-    <script src="js/auth.js?v=20260906_ui2"></script>
-    <script src="js/notifications.js?v=20260906_ui2"></script>
-    <script src="js/xp-service.js?v=20260906_ui2"></script>
-    <script src="js/date-util.js?v=20260906_ui2"></script>
-    <script src="js/stamp-groups.js?v=20260906_ui2"></script>
-    <script src="js/double-day.js?v=20260906_ui2"></script>
-    <script src="js/admin-approval.js?v=20260906_ui2"></script>
+    <script src="js/supabase-config.js?v=20260906_ui3"></script>
+    <script src="js/auth.js?v=20260906_ui3"></script>
+    <script src="js/notifications.js?v=20260906_ui3"></script>
+    <script src="js/xp-service.js?v=20260906_ui3"></script>
+    <script src="js/date-util.js?v=20260906_ui3"></script>
+    <script src="js/stamp-groups.js?v=20260906_ui3"></script>
+    <script src="js/double-day.js?v=20260906_ui3"></script>
+    <script src="js/admin-approval.js?v=20260906_ui3"></script>
 </body>
 </html>
