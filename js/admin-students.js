@@ -275,7 +275,7 @@ async function loadStudentEntries(studentId, studentName) {
                 ? '<span class="badge badge-approved">승인</span>'
                 : '<span class="badge badge-pending">대기중</span>'}</td>`;
 
-            cells += entry.greetings ? '<td>3%</td>' : '<td>-</td>';
+            cells += entry.greetings ? `<td>${3 * mult}%</td>` : '<td>-</td>';
 
             orderedValueTypes.forEach(vt => {
                 const stamp = entryStamps.find(s => s.value_type_id === vt.id);
@@ -288,11 +288,11 @@ async function loadStudentEntries(studentId, studentName) {
             });
 
             if (entry.assignments > 0) {
-                cells += `<td>${entry.assignments}개 (${entry.assignments * 5}%)</td>`;
+                cells += `<td>${entry.assignments}개 (${entry.assignments * 5 * mult}%)</td>`;
             } else { cells += '<td>-</td>'; }
 
-            if (entry.writing_type === '5%') { cells += '<td>5%</td>'; }
-            else if (entry.writing_type === '10%') { cells += '<td>10%</td>'; }
+            if (entry.writing_type === '5%') { cells += `<td>${5 * mult}%</td>`; }
+            else if (entry.writing_type === '10%') { cells += `<td>${10 * mult}%</td>`; }
             else { cells += '<td>-</td>'; }
 
             if (entryTitles.length > 0) {

@@ -138,7 +138,7 @@ async function loadProgressTable() {
             row.appendChild(statusCell);
 
             const greetCell = document.createElement('td');
-            greetCell.textContent = entry.greetings ? '3%' : '-';
+            greetCell.textContent = entry.greetings ? `${3 * mult}%` : '-';
             row.appendChild(greetCell);
 
             orderedValueTypes.forEach(vt => {
@@ -156,15 +156,15 @@ async function loadProgressTable() {
 
             const assignCell = document.createElement('td');
             assignCell.textContent = entry.assignments > 0
-                ? `${entry.assignments}개 (${entry.assignments * 5}%)`
+                ? `${entry.assignments}개 (${entry.assignments * 5 * mult}%)`
                 : '-';
             row.appendChild(assignCell);
 
             const writeCell = document.createElement('td');
             if (entry.writing_type === '5%') {
-                writeCell.textContent = '5%';
+                writeCell.textContent = `${5 * mult}%`;
             } else if (entry.writing_type === '10%') {
-                writeCell.textContent = '10%';
+                writeCell.textContent = `${10 * mult}%`;
             } else {
                 writeCell.textContent = '-';
             }
