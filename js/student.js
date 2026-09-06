@@ -359,7 +359,21 @@ function renderTodayEditBanner(entry) {
     if (banner) banner.style.display = todayPendingEntry ? 'flex' : 'none';
 }
 
-function openTodayEditModal() {
+function addTodayEditTitleInput() {
+    const container = document.getElementById('today-edit-title-inputs');
+    const count = container.querySelectorAll('.title-row').length;
+    if (count >= 5) {
+        alert('칭호는 최대 5개까지 입력할 수 있습니다.');
+        return;
+    }
+    const row = document.createElement('div');
+    row.className = 'title-row';
+    row.style.marginBottom = '6px';
+    row.innerHTML = '<input type="text" name="today-edit-title-name" placeholder="칭호 이름 (없으면 비워두세요)" class="input-inline">';
+    container.appendChild(row);
+}
+
+async function openTodayEditModal() {
     if (!todayPendingEntry) return;
 
     document.getElementById('today-edit-greetings').checked = todayPendingEntry.greetings;
@@ -368,6 +382,50 @@ function openTodayEditModal() {
     const writingValue = todayPendingEntry.writing_type || 'none';
     const writingRadio = document.querySelector(`input[name="today-edit-writing"][value="${writingValue}"]`);
     if (writingRadio) writingRadio.checked = true;
+
+    // Use this entry's own is_double_day flag (not any live toggle) so
+    // editing preserves whatever multiplier applied at original submission
+    const mult = todayPendingEntry.is_double_day ? 2 : 1;
+
+    const [{ data: valueTypes }, { data: stamps }, { data: titles }] = await Promise.all([
+        db.from('value_types').select('*').eq('active', true).order('id'),
+        db.from('entry_value_stamps').select('*').eq('entry_id', todayPendingEntry.id),
+        db.from('titles').select('*').eq('entry_id', todayPendingEntry.id)
+    ]);
+
+    const container = document.getElementById('today-edit-value-stamps');
+    renderStampGroups(container, valueTypes || [], vt => {
+        const existingStamp = (stamps || []).find(s => s.value_type_id === vt.id);
+        const checked = !!existingStamp;
+        const count = existingStamp ? (existingStamp.count || 1) : 1;
+        return `
+            <label class="checkbox-label">
+                <input type="checkbox" name="today-edit-vt" value="${vt.id}" data-points="${vt.points * mult}" data-name="${vt.name}" ${checked ? 'checked' : ''}
+                    onchange="this.closest('.stamp-count-item').querySelector('.stamp-count').disabled = !this.checked;">
+                <span>${vt.name}</span>
+            </label>
+            <input type="number" class="stamp-count input-small" min="1" max="20" value="${count}" ${checked ? '' : 'disabled'}
+                data-vt-id="${vt.id}">
+        `;
+    });
+
+    const titleContainer = document.getElementById('today-edit-title-inputs');
+    titleContainer.innerHTML = '';
+    if (titles && titles.length > 0) {
+        titles.forEach(t => {
+            const row = document.createElement('div');
+            row.className = 'title-row';
+            row.style.marginBottom = '6px';
+            row.innerHTML = `<input type="text" name="today-edit-title-name" placeholder="칭호 이름 (없으면 비워두세요)" class="input-inline" value="${t.title_name}">`;
+            titleContainer.appendChild(row);
+        });
+    } else {
+        const row = document.createElement('div');
+        row.className = 'title-row';
+        row.style.marginBottom = '6px';
+        row.innerHTML = '<input type="text" name="today-edit-title-name" placeholder="칭호 이름 (없으면 비워두세요)" class="input-inline">';
+        titleContainer.appendChild(row);
+    }
 
     document.getElementById('today-edit-modal').style.display = 'flex';
 }
@@ -391,6 +449,9 @@ async function saveTodayEntryEdit() {
         const writingInput = document.querySelector('input[name="today-edit-writing"]:checked');
         const writing = writingInput ? writingInput.value : 'none';
 
+        const entryId = todayPendingEntry.id;
+        const auditFields = { modified_at: getNowKST(), modified_by: currentProfile.id };
+
         // .eq('status', 'pending') double-checks the teacher hasn't approved
         // it in the meantime; .single() then errors if that row is gone
         const { error } = await db
@@ -399,10 +460,9 @@ async function saveTodayEntryEdit() {
                 greetings,
                 assignments,
                 writing_type: writing,
-                modified_at: getNowKST(),
-                modified_by: currentProfile.id
+                ...auditFields
             })
-            .eq('id', todayPendingEntry.id)
+            .eq('id', entryId)
             .eq('status', 'pending')
             .select()
             .single();
@@ -412,6 +472,48 @@ async function saveTodayEntryEdit() {
             closeTodayEditModal();
             await loadProgressTable();
             return;
+        }
+
+        // Rebuild stamps: delete old, insert new
+        await db.from('entry_value_stamps').delete().eq('entry_id', entryId);
+
+        const checkedStamps = document.querySelectorAll('input[name="today-edit-vt"]:checked');
+        if (checkedStamps.length > 0) {
+            const stampRecords = Array.from(checkedStamps).map(cb => {
+                const countInput = cb.closest('.stamp-count-item').querySelector('.stamp-count');
+                const count = parseInt(countInput.value) || 1;
+                return {
+                    entry_id: entryId,
+                    value_type_id: parseInt(cb.value),
+                    date: todayPendingEntry.date,
+                    student_name: currentProfile.name,
+                    value_name: cb.dataset.name,
+                    points: parseInt(cb.dataset.points),
+                    count: count,
+                    ...auditFields
+                };
+            });
+            await db.from('entry_value_stamps').insert(stampRecords);
+        }
+
+        // Rebuild titles: delete old, insert new from edit inputs
+        await db.from('titles').delete().eq('entry_id', entryId);
+
+        const titleInputs = document.querySelectorAll('#today-edit-title-inputs input[name="today-edit-title-name"]');
+        const titleNames = Array.from(titleInputs)
+            .map(input => input.value.trim())
+            .filter(name => name.length > 0);
+
+        if (titleNames.length > 0) {
+            const titleRecords = titleNames.map(name => ({
+                student_id: currentProfile.id,
+                entry_id: entryId,
+                title_name: name,
+                date_earned: todayPendingEntry.date,
+                status: 'pending',
+                ...auditFields
+            }));
+            await db.from('titles').insert(titleRecords);
         }
 
         closeTodayEditModal();

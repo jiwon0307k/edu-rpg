@@ -309,6 +309,32 @@ CREATE POLICY "notifications_delete" ON notifications FOR DELETE USING (is_admin
 
 ALTER TABLE daily_entries ADD COLUMN IF NOT EXISTS is_double_day BOOLEAN NOT NULL DEFAULT false;
 
+-- 1j. Let a student rebuild their own pending entry's stamps/titles -- RUN THIS NOW (not yet applied)
+-- (stamps_delete/titles_delete were admin-only; the student self-edit modal
+-- deletes-then-reinserts stamps/titles the same way the admin edit modal
+-- does, so it needs its own narrowly-scoped delete policy)
+CREATE POLICY "stamps_delete_own_pending" ON entry_value_stamps
+    FOR DELETE
+    USING (
+        EXISTS (
+            SELECT 1 FROM daily_entries
+            WHERE daily_entries.id = entry_value_stamps.entry_id
+            AND daily_entries.student_id = auth.uid()
+            AND daily_entries.status = 'pending'
+        )
+    );
+
+CREATE POLICY "titles_delete_own_pending" ON titles
+    FOR DELETE
+    USING (
+        student_id = auth.uid()
+        AND EXISTS (
+            SELECT 1 FROM daily_entries
+            WHERE daily_entries.id = titles.entry_id
+            AND daily_entries.status = 'pending'
+        )
+    );
+
 -- ============================================
 -- SETUP INSTRUCTIONS
 -- ============================================

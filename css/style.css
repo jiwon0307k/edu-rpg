@@ -884,7 +884,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .modal-wide {
-    max-width: 600px;
+    max-width: 720px;
     text-align: left;
 }
 
@@ -1213,7 +1213,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     background: #FEECC7;
 }
 
-#admin-greetings-label {
+#admin-greetings-label,
+#edit-greetings-label {
     display: inline-flex;
     align-items: center;
     justify-content: flex-start;
@@ -1221,7 +1222,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     padding: 8px 14px 8px 12px;
 }
 
-#admin-greetings-label input[type="checkbox"] {
+#admin-greetings-label input[type="checkbox"],
+#edit-greetings-label input[type="checkbox"] {
     margin-right: 8px;
 }
 
@@ -1232,7 +1234,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 /* Keep 날짜/인사/과제/글쓰기 labels and inputs at a uniform height even
    though some labels carry a 🔥 emoji that would otherwise grow taller */
 .admin-entry-col1 {
-    margin-bottom: 14px;
+    margin-bottom: 16px;
 }
 
 .admin-entry-col1 > label:first-child {
@@ -1246,10 +1248,32 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .admin-entry-col1 #admin-entry-date,
 .admin-entry-col1 #admin-greetings-label,
 .admin-entry-col1 #admin-assignments,
-.admin-entry-col1 #admin-writing {
-    height: 38px;
+.admin-entry-col1 #admin-writing,
+.admin-entry-col1 #edit-date,
+.admin-entry-col1 #edit-greetings-label,
+.admin-entry-col1 #edit-assignments,
+.admin-entry-col1 #edit-writing {
+    height: 40px;
     box-sizing: border-box;
     vertical-align: middle;
+}
+
+/* Butter-theme dropdown look shared with the batch-entry selects, applied
+   here too so 글쓰기 doesn't fall back to a dull native <select> chrome */
+#admin-writing,
+#edit-writing {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-color: var(--bg);
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath fill='%233E2E1E' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 10px 7px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    padding: 0 32px 0 14px;
 }
 
 .notif-empty {

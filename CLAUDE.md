@@ -91,3 +91,4 @@ RLS enforced: students see only their own data, admin sees all. `is_admin()` SQL
 - One CSS file for everything
 - Inline event handlers (onclick) are acceptable for admin UI simplicity
 - Prefer `async/await` with Supabase JS SDK v2
+- 커밋, 푸쉬를 완료하거나 사용자 피드백 대기 상태로 넘어갈 때, 작업 완료 신호로 bash 명령어 `afplay /System/Library/Sounds/Glass.aiff &`를 실행하여 소리로 알려줄 것.
