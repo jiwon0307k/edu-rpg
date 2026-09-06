@@ -386,6 +386,10 @@ async function deleteRecordAndRefresh(performDelete) {
     try {
         await performDelete();
         await recalculateAndSaveXP(selectedStudentId);
+        // If this deletion dropped an approved stamp count back below a
+        // milestone the student was already notified about, clear that
+        // stale notification so re-achieving it later fires correctly
+        await reconcileMilestoneNotifications(selectedStudentId);
         await loadStudentEntries(selectedStudentId, selectedStudentName);
         await loadStudents();
     } catch (err) {

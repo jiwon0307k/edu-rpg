@@ -1,5 +1,59 @@
 // XP Service: recalculation + milestone checks (shared by admin pages)
 
+// --- Milestone reconciliation ---
+// Deleting or editing an approved entry can drop a student's approved-stamp
+// count for a value type back below a milestone they were already notified
+// about. checkMilestones() only ever ADDS notifications and never removes
+// one, so a stale "level 2" notification would silently block a real future
+// re-achievement of level 2 (its existingSet check would think it was
+// already sent). Call this after anything that can reduce approved stamp
+// counts (currently: deleting an approved daily_entries row) so the ghost
+// notification is removed and the milestone can fire again honestly.
+//
+// Note: milestone notifications are NOT linked to the `titles` table in
+// this schema (a title is a manually-entered record tied to one entry_id,
+// not something checkMilestones ever creates) - so there is no title to
+// "reclaim" here, only notifications.
+async function reconcileMilestoneNotifications(studentId) {
+    const { data: entries } = await db
+        .from('daily_entries')
+        .select('id')
+        .eq('student_id', studentId)
+        .eq('status', 'approved');
+
+    const entryIds = (entries || []).map(e => e.id);
+
+    let stamps = [];
+    if (entryIds.length > 0) {
+        const { data } = await db
+            .from('entry_value_stamps')
+            .select('value_name, count')
+            .in('entry_id', entryIds);
+        stamps = data || [];
+    }
+
+    const countByName = {};
+    stamps.forEach(s => {
+        countByName[s.value_name] = (countByName[s.value_name] || 0) + (s.count || 1);
+    });
+
+    const { data: existing } = await db
+        .from('notifications')
+        .select('id, value_type_name, milestone_level')
+        .eq('student_id', studentId)
+        .neq('value_type_name', 'level_up');
+
+    if (!existing || existing.length === 0) return;
+
+    const staleIds = existing
+        .filter(n => n.milestone_level > Math.floor((countByName[n.value_type_name] || 0) / 10))
+        .map(n => n.id);
+
+    if (staleIds.length > 0) {
+        await db.from('notifications').delete().in('id', staleIds);
+    }
+}
+
 // --- Milestone check ---
 // Called after an entry becomes approved (approve, edit-approve, admin direct add)
 async function checkMilestones(studentId, studentName) {

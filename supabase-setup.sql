@@ -302,6 +302,11 @@ CREATE POLICY "entries_update_own_pending" ON daily_entries
     USING (student_id = auth.uid() AND status = 'pending')
     WITH CHECK (student_id = auth.uid() AND status = 'pending');
 
+-- 1i. notifications: allow admin to delete stale milestone notifications -- RUN THIS NOW (not yet applied)
+-- (there was no DELETE policy at all before, so RLS silently rejected any
+-- delete; needed for reconcileMilestoneNotifications() in xp-service.js)
+CREATE POLICY "notifications_delete" ON notifications FOR DELETE USING (is_admin());
+
 ALTER TABLE daily_entries ADD COLUMN IF NOT EXISTS is_double_day BOOLEAN NOT NULL DEFAULT false;
 
 -- ============================================
