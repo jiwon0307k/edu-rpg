@@ -1276,6 +1276,47 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     padding: 0 32px 0 14px;
 }
 
+/* === Edit Entry Modal (admin-students.html '기록 수정') — refined butter tone === */
+.edit-entry-col {
+    margin-bottom: 16px;
+}
+
+#edit-entry-date-field,
+#edit-entry-greetings-label,
+#edit-entry-assignments,
+#edit-entry-writing,
+#edit-entry-bonus-points,
+#edit-entry-bonus-reason {
+    height: 40px;
+    box-sizing: border-box;
+    background-color: #fffcf5;
+    border: 1.5px solid #ebd9b8;
+    border-radius: 8px;
+}
+
+#edit-entry-greetings-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 12px;
+}
+
+#edit-entry-writing {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath fill='%233E2E1E' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 10px 7px;
+    padding: 0 32px 0 14px;
+    color: var(--text);
+}
+
+.edit-entry-hint {
+    margin: 0 0 16px 0;
+}
+
 .notif-empty {
     padding: 24px 16px;
     text-align: center;
@@ -1355,7 +1396,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     padding: 6px 10px;
     background: var(--bg);
     border: 1px solid var(--border);
-    border-radius: 999px;
+    border-radius: 8px;
+    height: 40px;
     transition: background 0.2s, border-color 0.2s;
     margin-bottom: 0;
     min-width: 0;
@@ -1497,6 +1539,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     }
 
     .stamp-count-item {
+        height: auto;
         padding: 6px 8px;
         font-size: 13px;
     }
@@ -1583,6 +1626,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         display: flex;
         justify-content: space-between;
         align-items: center;
+        height: auto;
         padding: 4px 6px;
         font-size: 12px;
         letter-spacing: -0.6px;
