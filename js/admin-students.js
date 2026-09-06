@@ -517,8 +517,12 @@ async function saveEntryRowEdit() {
 
         if (error) throw error;
 
-        // Rebuild stamps: delete old, insert new
-        await db.from('entry_value_stamps').delete().eq('entry_id', entryId);
+        // Rebuild stamps: delete old, insert new. Check .error explicitly -
+        // if RLS silently blocks the delete (0 rows affected, no thrown
+        // error), inserting anyway would pile duplicates on top of the
+        // untouched old rows instead of replacing them.
+        const { error: stampsDeleteError } = await db.from('entry_value_stamps').delete().eq('entry_id', entryId);
+        if (stampsDeleteError) throw stampsDeleteError;
 
         const checkedStamps = document.querySelectorAll('input[name="edit-entry-vt"]:checked');
         if (checkedStamps.length > 0) {
@@ -540,7 +544,8 @@ async function saveEntryRowEdit() {
         }
 
         // Rebuild titles: delete old, insert new from edit inputs
-        await db.from('titles').delete().eq('entry_id', entryId);
+        const { error: titlesDeleteError } = await db.from('titles').delete().eq('entry_id', entryId);
+        if (titlesDeleteError) throw titlesDeleteError;
 
         const titleInputs = document.querySelectorAll('#edit-entry-title-inputs input[name="edit-entry-title-name"]');
         const titleNames = Array.from(titleInputs)

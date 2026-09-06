@@ -370,6 +370,9 @@ async function saveEdit() {
 
     try {
         await doSaveEdit();
+    } catch (err) {
+        console.error('Entry edit failed:', err);
+        alert('수정 처리 중 오류가 발생했습니다. 데이터를 보호하기 위해 변경을 취소합니다.');
     } finally {
         isSavingEdit = false;
         if (saveBtn) saveBtn.disabled = false;
@@ -403,8 +406,14 @@ async function doSaveEdit() {
         })
         .eq('id', entryId);
 
-    // Rebuild stamps: delete old, insert new
-    await db.from('entry_value_stamps').delete().eq('entry_id', entryId);
+    // Rebuild stamps: delete old, insert new. The delete must actually
+    // succeed before we insert - if RLS silently blocks it (0 rows deleted,
+    // no error thrown by Postgres for rows merely filtered out of the
+    // USING clause), inserting anyway would pile duplicates on top of the
+    // untouched old rows, so we still explicitly check .error here to catch
+    // any real permission/network failure and abort rather than insert.
+    const { error: stampsDeleteError } = await db.from('entry_value_stamps').delete().eq('entry_id', entryId);
+    if (stampsDeleteError) throw stampsDeleteError;
 
     // Get student name
     const { data: entryWithProfile } = await db
@@ -436,7 +445,8 @@ async function doSaveEdit() {
     }
 
     // Rebuild titles: delete old, insert new from edit inputs
-    await db.from('titles').delete().eq('entry_id', entryId);
+    const { error: titlesDeleteError } = await db.from('titles').delete().eq('entry_id', entryId);
+    if (titlesDeleteError) throw titlesDeleteError;
 
     const titleInputs = document.querySelectorAll('#title-inputs input[name="title-name"]');
     const titleNames = Array.from(titleInputs)

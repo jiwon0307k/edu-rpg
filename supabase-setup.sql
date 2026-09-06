@@ -335,6 +335,42 @@ CREATE POLICY "titles_delete_own_pending" ON titles
         )
     );
 
+-- 1k. One-time cleanup: 김지원 2026-09-06 pending 기록에 중복 누적된 협동
+-- 도장을 정상 상태(협동 10개/50%, 센스 1개/5%)로 재구성 -- RUN THIS NOW (not yet applied)
+-- (Until 1j above was run, stamps_delete had no policy letting a student
+-- delete their own pending stamps, so every save of the 오늘의 기록 수정
+-- modal silently failed to delete the old 협동 rows and just inserted a
+-- fresh set on top - this rebuilds that one entry's stamps from scratch.
+-- Run 1j FIRST so future saves don't re-create this same duplication.)
+DO $$
+DECLARE
+    v_entry_id INTEGER;
+    v_student_name TEXT;
+    v_date DATE;
+BEGIN
+    SELECT de.id, p.name, de.date
+    INTO v_entry_id, v_student_name, v_date
+    FROM daily_entries de
+    JOIN profiles p ON p.id = de.student_id
+    WHERE p.name = '김지원' AND de.date = '2026-09-06' AND de.status = 'pending'
+    LIMIT 1;
+
+    IF v_entry_id IS NULL THEN
+        RAISE NOTICE '해당 조건(김지원 / 2026-09-06 / pending)의 기록을 찾지 못했습니다. 이미 정리되었거나 조건이 다를 수 있습니다.';
+        RETURN;
+    END IF;
+
+    DELETE FROM entry_value_stamps WHERE entry_id = v_entry_id;
+
+    INSERT INTO entry_value_stamps (entry_id, value_type_id, date, student_name, value_name, points, count)
+    SELECT v_entry_id, vt.id, v_date, v_student_name, vt.name, vt.points, 10
+    FROM value_types vt WHERE vt.name = '협동';
+
+    INSERT INTO entry_value_stamps (entry_id, value_type_id, date, student_name, value_name, points, count)
+    SELECT v_entry_id, vt.id, v_date, v_student_name, vt.name, vt.points, 1
+    FROM value_types vt WHERE vt.name = '센스';
+END $$;
+
 -- ============================================
 -- SETUP INSTRUCTIONS
 -- ============================================

@@ -349,8 +349,8 @@ function renderPendingXP(cumulativeXP, pendingXP) {
         : `⏳ 승인 대기 중: +${pendingXP}% (승인 완료 시 Lv.${projectedLevel} ${projectedRemainder}% 예정)`;
 }
 
-// --- Edit today's own pending entry (인사/과제/글쓰기만; stamps/titles are
-// left as originally submitted) ---
+// --- Edit today's own pending entry (all fields, including stamps/titles,
+// which are rebuilt via delete-then-reinsert on save) ---
 let todayPendingEntry = null;
 
 function renderTodayEditBanner(entry) {
@@ -474,8 +474,12 @@ async function saveTodayEntryEdit() {
             return;
         }
 
-        // Rebuild stamps: delete old, insert new
-        await db.from('entry_value_stamps').delete().eq('entry_id', entryId);
+        // Rebuild stamps: delete old, insert new. Check .error explicitly -
+        // if RLS silently blocks the delete (0 rows affected, no thrown
+        // error), inserting anyway would pile duplicates on top of the
+        // untouched old rows instead of replacing them.
+        const { error: stampsDeleteError } = await db.from('entry_value_stamps').delete().eq('entry_id', entryId);
+        if (stampsDeleteError) throw stampsDeleteError;
 
         const checkedStamps = document.querySelectorAll('input[name="today-edit-vt"]:checked');
         if (checkedStamps.length > 0) {
@@ -497,7 +501,8 @@ async function saveTodayEntryEdit() {
         }
 
         // Rebuild titles: delete old, insert new from edit inputs
-        await db.from('titles').delete().eq('entry_id', entryId);
+        const { error: titlesDeleteError } = await db.from('titles').delete().eq('entry_id', entryId);
+        if (titlesDeleteError) throw titlesDeleteError;
 
         const titleInputs = document.querySelectorAll('#today-edit-title-inputs input[name="today-edit-title-name"]');
         const titleNames = Array.from(titleInputs)
@@ -518,6 +523,9 @@ async function saveTodayEntryEdit() {
 
         closeTodayEditModal();
         await loadProgressTable();
+    } catch (err) {
+        console.error('Today entry edit failed:', err);
+        alert('수정 처리 중 오류가 발생했습니다. 데이터를 보호하기 위해 변경을 취소합니다.');
     } finally {
         isSavingTodayEdit = false;
         if (saveBtn) saveBtn.disabled = false;
