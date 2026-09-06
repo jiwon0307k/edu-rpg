@@ -107,3 +107,21 @@ async function markAsRead(notifId) {
 
     await refreshNotifBadge();
 }
+
+async function markAllAsRead() {
+    if (!window._notifUserId) return;
+
+    await db
+        .from('notifications')
+        .update({ status: 'read' })
+        .eq('recipient_id', window._notifUserId)
+        .eq('status', 'sent');
+
+    document.querySelectorAll('.notif-item.unread').forEach(item => {
+        item.classList.remove('unread');
+        const btn = item.querySelector('.notif-read-btn');
+        if (btn) btn.remove();
+    });
+
+    await refreshNotifBadge();
+}
