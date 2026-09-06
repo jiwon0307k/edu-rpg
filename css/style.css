@@ -1502,6 +1502,10 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     padding: 2px 14px 4px;
 }
 
+.stamp-summary-lead {
+    text-align: left;
+}
+
 .stamp-summary-label {
     font-size: 11px;
     font-weight: 700;
@@ -1513,48 +1517,50 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 30px;
-    height: 24px;
-    padding: 0 4px;
-    border-radius: 6px;
-    font-size: 12px;
+    min-width: 38px;
+    height: 26px;
+    padding: 0 6px;
+    border-radius: 8px;
+    font-size: 11px;
+    white-space: nowrap;
     box-sizing: border-box;
 }
 
 .stamp-summary-badge.tier-0 {
-    background: #f8f6f0;
-    color: #a89f91;
-    opacity: 0.4;
-    border: 1px dashed #dcd5c9;
+    background: #fbf9f5;
+    color: #c4bcb0;
+    border: 1px dashed #e5dfd5;
+    opacity: 0.5;
 }
 
 .stamp-summary-badge.tier-1 {
-    background: #fff9db;
-    color: #73510d;
-    border: 1px solid #f1d27a;
+    background: #fffbe6;
+    color: #876800;
+    border: 1px solid #ffe58f;
 }
 
 .stamp-summary-badge.tier-2 {
-    background: #ffe58f;
-    color: #613b00;
+    background: #ffd666;
+    color: #5c3a00;
     font-weight: 700;
-    border: 1px solid #d4953c;
+    border: 1px solid #faad14;
 }
 
 .stamp-summary-badge.tier-3 {
-    background: #ffd666;
-    color: #402300;
+    background: #faad14;
+    color: #ffffff;
     font-weight: 700;
-    border: 1px solid #ad6800;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    border: 1px solid #d48806;
 }
 
 .stamp-summary-badge.tier-4 {
-    background: #d48806;
+    background: linear-gradient(135deg, #f5c842 0%, #d49a1e 100%);
     color: #ffffff;
     font-weight: 800;
-    border: 1px solid #874d00;
-    box-shadow: 0 2px 4px rgba(212, 136, 6, 0.25);
+    text-shadow: 0 1px 2px rgba(90, 60, 0, 0.4);
+    border: 1px solid #b88312;
+    border-radius: 8px;
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.5), 0 2px 5px rgba(212, 154, 30, 0.35);
 }
 
 /* === Multi-Penalty Row === */

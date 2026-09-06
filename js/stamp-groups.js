@@ -87,9 +87,12 @@ function stampShowcaseTier(count) {
 // real header row, so each badge <th> lands directly above its column.
 // `leadingCount` covers the 날짜/총경험치/상태/인사 columns before the
 // value-type columns start (always 4); `trailingCount` covers whatever
-// columns follow (과제/글쓰기/칭호/보너스/총경험치/누적경험치[/관리]) -
-// both get empty, transparent <th> cells so only the value-type columns
-// carry a badge.
+// columns follow (과제/글쓰기/칭호/보너스/총경험치/누적경험치[/관리]).
+// Both groups are collapsed into one colspan'd, transparent <th> each -
+// only the value-type columns get their own individual <th> with a badge -
+// but the SUM of colspans always equals the real header's column count, so
+// the grid can never drift out of alignment no matter how many value types
+// exist.
 function buildStampSummaryRow(orderedValueTypes, entries, stamps, trailingCount, leadingCount = 4) {
     const approvedEntryIds = new Set(
         (entries || []).filter(e => e.status === 'approved').map(e => e.id)
@@ -102,15 +105,15 @@ function buildStampSummaryRow(orderedValueTypes, entries, stamps, trailingCount,
     });
 
     let html = '<tr class="stamp-summary-row">';
-    html += '<th><span class="stamp-summary-label">🏅 모은 도장</span></th>';
-    for (let i = 1; i < leadingCount; i++) html += '<th></th>';
+    html += `<th colspan="${leadingCount}" class="stamp-summary-lead"><span class="stamp-summary-label">🏅 모은 도장</span></th>`;
 
     orderedValueTypes.forEach(vt => {
         const count = countByTypeId[vt.id] || 0;
-        html += `<th><span class="stamp-summary-badge ${stampShowcaseTier(count)}">${count}</span></th>`;
+        const tier = stampShowcaseTier(count);
+        html += `<th><span class="stamp-summary-badge ${tier}">${count}</span></th>`;
     });
 
-    for (let i = 0; i < trailingCount; i++) html += '<th></th>';
+    if (trailingCount > 0) html += `<th colspan="${trailingCount}"></th>`;
     html += '</tr>';
     return html;
 }
