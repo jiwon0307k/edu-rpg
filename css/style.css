@@ -970,29 +970,29 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .btn-batch-exc {
-    font-size: 0.85rem;
-    font-weight: 500;
-    padding: 2px 7px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 4px 12px;
     border-radius: 999px;
-    background: transparent;
-    border: 1px solid transparent;
+    background: #FFF9EB;
+    border: 1px solid #EEDBB2;
     color: #7A5C2E;
     cursor: pointer;
-    transition: background 0.2s, border-color 0.2s;
+    transition: background 0.2s;
 }
 
 .btn-batch-exc:hover {
-    background: #FFF9EB;
-    border-color: #EEDBB2;
+    background: #FEECC7;
 }
 
 .btn-batch-exc-danger {
+    background: rgba(230, 103, 96, 0.12);
+    border-color: var(--danger);
     color: var(--danger);
 }
 
 .btn-batch-exc-danger:hover {
-    background: rgba(230, 103, 96, 0.12);
-    border-color: var(--danger);
+    background: rgba(230, 103, 96, 0.22);
 }
 
 .batch-exception-row td {
