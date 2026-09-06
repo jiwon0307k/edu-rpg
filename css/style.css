@@ -966,13 +966,17 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 #admin-greetings-label {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     gap: 8px;
-    padding: 8px 14px;
+    padding: 8px 14px 8px 12px;
 }
 
 #admin-greetings-label input[type="checkbox"] {
     margin-right: 8px;
+}
+
+#admin-bonus-group {
+    margin-bottom: 20px;
 }
 
 .notif-empty {
