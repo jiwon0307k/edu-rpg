@@ -1136,23 +1136,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 /* === Notification Bell === */
-/* Fixed 28x28 icon box so the bell never gets squeezed/stretched by the
-   flex nav row on narrow screens. There's no <img> here - the bell is a
-   plain 🔔 text glyph - so its "icon size" is set via font-size (22px)
-   rather than a width/height on an image element. */
 .notification-bell {
     position: relative;
     cursor: pointer;
-    flex-shrink: 0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
-    box-sizing: border-box;
-    padding: 0;
-    font-size: 22px;
+    font-size: 1.3rem;
     line-height: 1;
+    padding: 4px 6px;
     background: none;
     border: none;
     color: var(--text);
@@ -1163,28 +1152,18 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     color: var(--heading);
 }
 
-/* Small, precise micro-badge flush at the bell's top-right corner */
 .notification-bell .notif-badge {
     position: absolute;
-    top: 0;
-    right: 0;
-    width: 14px;
-    height: 14px;
-    min-width: 14px;
-    padding: 0;
-    box-sizing: border-box;
-    border-radius: 50%;
-    background: #e03838;
-    color: #ffffff;
-    font-size: 9px;
+    top: -4px;
+    right: -6px;
+    background: var(--danger);
+    color: white;
+    font-size: 0.65rem;
     font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    line-height: 1;
-    border: 1.5px solid #fffdfa;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
-    pointer-events: none;
+    padding: 1px 5px;
+    border-radius: 10px;
+    min-width: 16px;
+    text-align: center;
 }
 
 .notification-dropdown {
@@ -1453,8 +1432,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .notification-wrapper {
     position: relative;
-    flex-shrink: 0;
-    margin-right: 8px;
 }
 
 /* === Stamp Grid (value-stamp tag chips, life/study segments divided by a thin rule) === */
@@ -1698,23 +1675,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         flex-direction: column;
         align-items: flex-start;
         gap: 4px;
-    }
-}
-
-/* Keep the bell/badge at the exact same coordinates on small phones - no
-   separate mobile-only positioning so nothing drifts or gets clipped */
-@media (max-width: 600px) {
-    .notification-bell {
-        width: 28px;
-        height: 28px;
-    }
-
-    .notification-bell .notif-badge {
-        top: 0;
-        right: 0;
-        width: 14px;
-        height: 14px;
-        min-width: 14px;
     }
 }
 
