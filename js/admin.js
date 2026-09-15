@@ -12,6 +12,7 @@ let allPenaltyTypes = [];
     await initDoubleDayToggle();
     await loadValueTypes();
     await loadPenaltyTypes();
+    await refreshStampRequestBadge();
 })();
 
 // --- 2x XP Day Toggle ---
@@ -267,4 +268,160 @@ async function togglePenaltyType(id, active) {
         .eq('id', id);
 
     await loadPenaltyTypes();
+}
+
+// --- Stamp Request ("도장 조르기") Review ---
+// Separate from the shared notification bell (#notif-bell/notifications.js)
+// on purpose - a distinct #stamp-request-bell with its own badge/click
+// handler, so this doesn't fight with the shared bell's already-bound
+// dropdown-toggle listener.
+async function refreshStampRequestBadge() {
+    const badge = document.getElementById('stamp-request-count');
+    if (!badge) return;
+
+    const { count } = await db
+        .from('stamp_requests')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'pending');
+
+    if (count > 0) {
+        badge.textContent = count;
+        badge.style.display = 'inline';
+    } else {
+        badge.style.display = 'none';
+    }
+}
+
+async function openStampRequestReviewModal() {
+    await loadStampRequestCards();
+    document.getElementById('stamp-request-review-modal').style.display = 'flex';
+}
+
+function closeStampRequestReviewModal() {
+    document.getElementById('stamp-request-review-modal').style.display = 'none';
+}
+
+async function loadStampRequestCards() {
+    const list = document.getElementById('stamp-request-review-list');
+    const empty = document.getElementById('stamp-request-review-empty');
+
+    const { data } = await db
+        .from('stamp_requests')
+        .select('*')
+        .eq('status', 'pending')
+        .order('created_at', { ascending: false });
+
+    if (!data || data.length === 0) {
+        list.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+    }
+
+    empty.style.display = 'none';
+    list.innerHTML = data.map(r => {
+        const time = new Date(r.created_at).toLocaleDateString('ko-KR', {
+            month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+        });
+        return `
+            <div class="stamp-request-card" id="stamp-request-${r.id}">
+                <div class="stamp-request-card-header">
+                    <strong>${r.student_name} · ${r.stamp_type}</strong>
+                    <span class="text-muted">${time}</span>
+                </div>
+                <p class="stamp-request-reason">${r.reason}</p>
+                <div class="form-actions">
+                    <button class="btn btn-small btn-primary" onclick="approveStampRequest('${r.id}')">승인</button>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+let stampRequestsBeingApproved = new Set();
+
+async function approveStampRequest(requestId) {
+    if (stampRequestsBeingApproved.has(requestId)) return;
+    stampRequestsBeingApproved.add(requestId);
+
+    const card = document.getElementById(`stamp-request-${requestId}`);
+    const btn = card ? card.querySelector('button') : null;
+    if (btn) btn.disabled = true;
+
+    try {
+        const { data: request } = await db
+            .from('stamp_requests')
+            .select('*')
+            .eq('id', requestId)
+            .single();
+
+        if (!request) return;
+
+        const valueType = allValueTypes.find(vt => vt.name === request.stamp_type);
+        if (!valueType) {
+            alert(`'${request.stamp_type}' 가치 종류를 찾을 수 없습니다. 관리 설정에서 확인해주세요.`);
+            return;
+        }
+
+        const isDoubleDay = await getDoubleXPDayActive();
+        const auditFields = { modified_at: getNowKST(), modified_by: currentProfile.id };
+        const today = getTodayISO();
+
+        // Grant the stamp the same way every other XP source works: a real
+        // approved daily_entries row + entry_value_stamps row, then let
+        // recalculateAndSaveXP re-sum everything from scratch
+        const { data: entry, error: entryError } = await db
+            .from('daily_entries')
+            .insert({
+                student_id: request.user_id,
+                date: today,
+                greetings: false,
+                assignments: 0,
+                writing_type: 'none',
+                status: 'approved',
+                is_double_day: isDoubleDay,
+                ...auditFields
+            })
+            .select()
+            .single();
+
+        if (entryError) throw entryError;
+
+        const { error: stampError } = await db
+            .from('entry_value_stamps')
+            .insert({
+                entry_id: entry.id,
+                value_type_id: valueType.id,
+                date: today,
+                student_name: request.student_name,
+                value_name: valueType.name,
+                points: valueType.points,
+                count: 1,
+                ...auditFields
+            });
+
+        if (stampError) throw stampError;
+
+        const { error: statusError } = await db
+            .from('stamp_requests')
+            .update({ status: 'approved' })
+            .eq('id', requestId);
+
+        if (statusError) throw statusError;
+
+        await recalculateAndSaveXP(request.user_id);
+
+        if (card) card.remove();
+        await refreshStampRequestBadge();
+
+        const list = document.getElementById('stamp-request-review-list');
+        if (list && list.children.length === 0) {
+            document.getElementById('stamp-request-review-empty').style.display = 'block';
+        }
+    } catch (err) {
+        console.error('Stamp request approval failed:', err);
+        alert('승인 처리 중 오류가 발생했습니다. 다시 시도해주세요.');
+        if (btn) btn.disabled = false;
+    } finally {
+        stampRequestsBeingApproved.delete(requestId);
+    }
 }

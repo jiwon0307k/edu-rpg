@@ -379,6 +379,37 @@ END $$;
 ALTER TABLE daily_entries ADD COLUMN IF NOT EXISTS penalty_points INTEGER NOT NULL DEFAULT 0;
 ALTER TABLE daily_entries ADD COLUMN IF NOT EXISTS penalty_reason TEXT DEFAULT '';
 
+-- 1m. "도장 조르기" (stamp request) system -- RUN THIS NOW (not yet applied)
+-- Students can ask for one value-type stamp with a reason, at most once per
+-- calendar week (Mon 00:00 KST enforced client-side by the request query,
+-- not by a DB constraint). Teacher approval on admin.html grants the stamp
+-- by creating a normal approved daily_entries + entry_value_stamps pair and
+-- reusing recalculateAndSaveXP(), so it stays fully consistent with every
+-- other XP source in the app.
+CREATE TABLE IF NOT EXISTS stamp_requests (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    student_name TEXT NOT NULL,
+    stamp_type TEXT NOT NULL,
+    reason TEXT NOT NULL,
+    status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
+    created_at TIMESTAMPTZ DEFAULT now()
+);
+
+ALTER TABLE stamp_requests ENABLE ROW LEVEL SECURITY;
+
+-- Students can insert and read only their own requests
+CREATE POLICY "stamp_requests_insert_own" ON stamp_requests
+    FOR INSERT WITH CHECK (user_id = auth.uid());
+
+-- Students see their own; admin sees all
+CREATE POLICY "stamp_requests_select" ON stamp_requests
+    FOR SELECT USING (user_id = auth.uid() OR is_admin());
+
+-- Only admin can update (approve/reject)
+CREATE POLICY "stamp_requests_update_admin" ON stamp_requests
+    FOR UPDATE USING (is_admin());
+
 -- ============================================
 -- SETUP INSTRUCTIONS
 -- ============================================

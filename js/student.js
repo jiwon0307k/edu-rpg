@@ -534,3 +534,115 @@ async function saveTodayEntryEdit() {
         if (saveBtn) saveBtn.disabled = false;
     }
 }
+
+// --- Stamp Request ("도장 조르기") ---
+// Students may ask for one value-type stamp with a reason, at most once per
+// calendar week. The weekly check queries stamp_requests created since this
+// week's Monday 00:00 KST (getMondayKSTISO, js/date-util.js) - a real teacher
+// approval on admin.html is what actually grants the stamp/XP, this only
+// records the request.
+let isCheckingStampRequest = false;
+
+async function openStampRequestFlow() {
+    if (isCheckingStampRequest) return;
+    isCheckingStampRequest = true;
+
+    try {
+        const { data: existing } = await db
+            .from('stamp_requests')
+            .select('id')
+            .eq('user_id', currentProfile.id)
+            .gte('created_at', getMondayKSTISO())
+            .limit(1);
+
+        if (existing && existing.length > 0) {
+            document.getElementById('stamp-request-blocked-modal').style.display = 'flex';
+            return;
+        }
+
+        await openStampRequestModal();
+    } finally {
+        isCheckingStampRequest = false;
+    }
+}
+
+function closeStampRequestBlockedModal() {
+    document.getElementById('stamp-request-blocked-modal').style.display = 'none';
+}
+
+async function openStampRequestModal() {
+    const { data: valueTypes } = await db
+        .from('value_types')
+        .select('*')
+        .eq('active', true)
+        .order('id');
+
+    const container = document.getElementById('stamp-request-value-stamps');
+    renderStampGroups(container, valueTypes || [], vt => `
+        <label class="checkbox-label">
+            <input type="checkbox" name="stamp-request-type" value="${vt.id}" data-name="${vt.name}"
+                onchange="enforceSingleStampRequestSelection(this)">
+            <span>${vt.name}</span>
+        </label>
+    `);
+
+    document.getElementById('stamp-request-reason').value = '';
+    document.getElementById('stamp-request-modal').style.display = 'flex';
+}
+
+// Checkboxes rendered via the shared stamp grid, but only one may be picked
+function enforceSingleStampRequestSelection(changedInput) {
+    if (!changedInput.checked) return;
+    document.querySelectorAll('input[name="stamp-request-type"]').forEach(input => {
+        if (input !== changedInput) input.checked = false;
+    });
+}
+
+function closeStampRequestModal() {
+    document.getElementById('stamp-request-modal').style.display = 'none';
+}
+
+let isSubmittingStampRequest = false;
+
+async function submitStampRequest() {
+    if (isSubmittingStampRequest) return;
+
+    const selected = document.querySelector('input[name="stamp-request-type"]:checked');
+    if (!selected) {
+        alert('가치도장을 1개 선택해주세요.');
+        return;
+    }
+
+    const reason = document.getElementById('stamp-request-reason').value.trim();
+    if (!reason) {
+        alert('사유를 입력해주세요.');
+        return;
+    }
+
+    isSubmittingStampRequest = true;
+    const submitBtn = document.getElementById('stamp-request-submit-btn');
+    if (submitBtn) submitBtn.disabled = true;
+
+    try {
+        const { error } = await db
+            .from('stamp_requests')
+            .insert({
+                user_id: currentProfile.id,
+                student_name: currentProfile.name,
+                stamp_type: selected.dataset.name,
+                reason: reason,
+                status: 'pending'
+            });
+
+        if (error) throw error;
+
+        closeStampRequestModal();
+        alert('가치도장을 요청했어요! 선생님의 승인을 기다려주세요.');
+    } catch (err) {
+        console.error('Stamp request failed:', err);
+        alert('요청 처리 중 오류가 발생했습니다. 다시 시도해주세요.');
+    } finally {
+        isSubmittingStampRequest = false;
+        if (submitBtn) submitBtn.disabled = false;
+    }
+}

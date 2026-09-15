@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>경험치 통장 - 내 기록</title>
-    <link rel="stylesheet" href="css/style.css?v=20260915_penalty_ui">
+    <link rel="stylesheet" href="css/style.css?v=20260915_stamp_request">
     <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
 </head>
 <body>
@@ -22,6 +22,7 @@
                 </div>
             </div>
             <a href="student-input.html" class="btn btn-small btn-primary">경험치 입력</a>
+            <button class="btn btn-small btn-secondary" onclick="openStampRequestFlow()">✨ 도장 조르기</button>
             <button onclick="logout()" class="btn btn-small btn-secondary">로그아웃</button>
         </div>
     </nav>
@@ -111,6 +112,36 @@
         </div>
     </div>
 
+    <!-- Stamp Request ("도장 조르기") Modal -->
+    <div class="modal-overlay" id="stamp-request-modal" style="display:none;">
+        <div class="modal modal-wide">
+            <h3>✨ 가치도장 주세요!</h3>
+            <div class="form-group">
+                <label>가치도장 선택 (1개)</label>
+                <div id="stamp-request-value-stamps"></div>
+            </div>
+            <div class="form-group">
+                <label for="stamp-request-reason">사유</label>
+                <textarea id="stamp-request-reason" rows="4" placeholder="이 가치도장을 받아야 하는 이유를 자세히 설명해주세요."></textarea>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-primary" id="stamp-request-submit-btn" onclick="submitStampRequest()">요청하기</button>
+                <button class="btn btn-secondary" onclick="closeStampRequestModal()">취소</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stamp Request Blocked Modal (weekly limit) -->
+    <div class="modal-overlay" id="stamp-request-blocked-modal" style="display:none;">
+        <div class="modal">
+            <h3>이번 주에 이미 가치도장을 요청했어요!🥹</h3>
+            <p class="text-muted" style="margin-left:0;">가치도장 조르기는 일주일에 한 번만 할 수 있어요. 다음 주 월요일에 다시 시도해주세요!</p>
+            <div class="form-actions">
+                <button class="btn btn-primary" onclick="closeStampRequestBlockedModal()">확인</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Level Up Celebration Modal -->
     <div class="modal-overlay" id="level-up-modal" style="display:none;">
         <div class="modal level-up-card">
@@ -125,8 +156,8 @@
     <script src="js/supabase-config.js?v=20260906_ui3"></script>
     <script src="js/auth.js?v=20260906_ui3"></script>
     <script src="js/notifications.js?v=20260906_ui3"></script>
-    <script src="js/date-util.js?v=20260906_ui3"></script>
+    <script src="js/date-util.js?v=20260915_stamp_request"></script>
     <script src="js/stamp-groups.js?v=20260906_royal_gold"></script>
-    <script src="js/student.js?v=20260915_penalty_ui"></script>
+    <script src="js/student.js?v=20260915_stamp_request"></script>
 </body>
 </html>

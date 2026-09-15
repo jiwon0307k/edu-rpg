@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>경험치 통장 - 관리자</title>
-    <link rel="stylesheet" href="css/style.css?v=20260915_penalty_ui">
+    <link rel="stylesheet" href="css/style.css?v=20260915_stamp_request">
     <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
 </head>
 <body>
@@ -19,6 +19,9 @@
                     <div class="notif-header"><span>알림</span><button class="btn-mark-all-read" onclick="markAllAsRead()">모두 읽음</button></div>
                     <div id="notif-list"></div>
                 </div>
+            </div>
+            <div class="notification-wrapper">
+                <button class="notification-bell" id="stamp-request-bell" title="도장 조르기 요청" onclick="openStampRequestReviewModal()">🔔<span class="notif-badge" id="stamp-request-count" style="display:none;"></span></button>
             </div>
             <a href="admin-students.html" class="btn btn-small btn-secondary">학생 관리</a>
             <a href="admin-approval.html" class="btn btn-small btn-secondary">
@@ -110,12 +113,25 @@
         </div>
     </main>
 
+    <!-- Stamp Request ("도장 조르기") Review Modal -->
+    <div class="modal-overlay" id="stamp-request-review-modal" style="display:none;">
+        <div class="modal modal-wide">
+            <h3>🔔 도장 조르기 요청함</h3>
+            <div id="stamp-request-review-list"></div>
+            <p id="stamp-request-review-empty" class="text-center text-muted" style="display:none;">대기 중인 요청이 없습니다.</p>
+            <div class="form-actions">
+                <button class="btn btn-secondary" onclick="closeStampRequestReviewModal()">닫기</button>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.100.1"></script>
     <script src="js/supabase-config.js?v=20260906_ui3"></script>
     <script src="js/auth.js?v=20260906_ui3"></script>
     <script src="js/notifications.js?v=20260906_ui3"></script>
-    <script src="js/date-util.js?v=20260906_ui3"></script>
+    <script src="js/date-util.js?v=20260915_stamp_request"></script>
     <script src="js/double-day.js?v=20260906_ui3"></script>
-    <script src="js/admin.js?v=20260906_ui3"></script>
+    <script src="js/xp-service.js?v=20260915_penalty_ui"></script>
+    <script src="js/admin.js?v=20260915_stamp_request"></script>
 </body>
 </html>
