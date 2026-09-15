@@ -512,8 +512,10 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     color: var(--heading);
     font-size: 0.85rem;
     font-weight: 600;
+    line-height: 1.5;
+    text-align: center;
     padding: 6px 14px;
-    border-radius: 999px;
+    border-radius: 14px;
     margin-bottom: 10px;
 }
 
@@ -1286,7 +1288,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 /* Bonus row (승인 대기 edit / 기록 수정 edit) — same butter tone/height as
    the other admin-entry-col1 fields, sized per the 도장 개수 · 사유 spec */
 #edit-bonus-points,
-#edit-entry-bonus-points {
+#edit-entry-bonus-points,
+#edit-penalty-points {
     width: 80px;
     height: 40px;
     box-sizing: border-box;
@@ -1299,7 +1302,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 #edit-bonus-reason,
-#edit-entry-bonus-reason {
+#edit-entry-bonus-reason,
+#edit-penalty-reason {
     flex: 1;
     height: 40px;
     box-sizing: border-box;
@@ -1823,5 +1827,20 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     /* Keep the submit button clear of any bottom overlay */
     .form-card {
         padding-bottom: 70px;
+    }
+
+    /* "오늘 제출한 기록이 승인 대기 중이에요." should wrap at word
+       boundaries ("오늘 제출한 기록이" / "승인 대기 중이에요."), never
+       mid-syllable, and keep breathing room next to the 수정 button */
+    .today-edit-banner {
+        gap: 14px;
+    }
+
+    .today-edit-banner span {
+        word-break: keep-all;
+    }
+
+    .today-edit-banner button {
+        flex-shrink: 0;
     }
 }

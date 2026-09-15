@@ -269,6 +269,7 @@ async function loadStudentEntries(studentId, studentName) {
             else if (entry.writing_type === '10%') dailyXP += 10 * mult;
             if (entryTitles.length > 0) dailyXP += entryTitles.length * 20;
             if (entry.bonus_points > 0) dailyXP += entry.bonus_points;
+            if (entry.penalty_points > 0) dailyXP -= entry.penalty_points;
 
             if (entry.status === 'approved') cumulativeXP += dailyXP;
 

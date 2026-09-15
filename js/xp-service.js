@@ -158,6 +158,7 @@ async function recalculateAndSaveXP(studentId) {
             if (e.writing_type === '5%') totalXP += 5 * mult;
             if (e.writing_type === '10%') totalXP += 10 * mult;
             if (e.bonus_points) totalXP += e.bonus_points;
+            if (e.penalty_points) totalXP -= e.penalty_points;
         });
 
         const entryIds = entries.map(e => e.id);

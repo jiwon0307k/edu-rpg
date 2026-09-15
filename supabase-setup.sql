@@ -371,6 +371,14 @@ BEGIN
     FROM value_types vt WHERE vt.name = '센스';
 END $$;
 
+-- 1l. daily_entries: add penalty_points/penalty_reason -- RUN THIS NOW (not yet applied)
+-- (mirrors bonus_points/bonus_reason exactly - the 승인 대기 edit modal's
+-- new 감점 field lets a teacher dock a quick ad-hoc percentage off a single
+-- entry, separate from the formal penalty_types/penalties system. Read and
+-- subtracted in recalculateAndSaveXP, js/xp-service.js.)
+ALTER TABLE daily_entries ADD COLUMN IF NOT EXISTS penalty_points INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE daily_entries ADD COLUMN IF NOT EXISTS penalty_reason TEXT DEFAULT '';
+
 -- ============================================
 -- SETUP INSTRUCTIONS
 -- ============================================
@@ -382,4 +390,4 @@ END $$;
 --      INSERT INTO profiles (id, name, role) VALUES ('<student-user-uuid>', '학생이름', 'student');
 -- 3. Copy your Supabase URL and anon key from Settings > API
 -- 4. Paste them into js/supabase-config.js
--- 5. Deploy the folder to Netlify (drag & drop)
+-- 5. Deploy the repository folder as-is (e.g. GitHub Pages) — no build step needed

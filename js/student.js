@@ -120,6 +120,7 @@ async function loadProgressTable() {
             else if (entry.writing_type === '10%') dailyXP += 10 * mult;
             if (entryTitles.length > 0) dailyXP += entryTitles.length * 20;
             if (entry.bonus_points > 0) dailyXP += entry.bonus_points;
+            if (entry.penalty_points > 0) dailyXP -= entry.penalty_points;
 
             if (entry.status === 'approved') {
                 cumulativeXP += dailyXP;
@@ -346,9 +347,9 @@ function renderPendingXP(cumulativeXP, pendingXP) {
 
     badge.classList.toggle('level-up', willLevelUp);
     badge.style.display = 'inline-block';
-    badge.textContent = willLevelUp
-        ? `✨ 승인 대기 중: +${pendingXP}% (승인 완료 시 Lv.${projectedLevel} ${projectedRemainder}% 달성 예정! 🎉)`
-        : `⏳ 승인 대기 중: +${pendingXP}% (승인 완료 시 Lv.${projectedLevel} ${projectedRemainder}% 예정)`;
+    badge.innerHTML = willLevelUp
+        ? `✨ 승인 대기 중: +${pendingXP}%<br>(승인 완료 시 Lv.${projectedLevel} ${projectedRemainder}% 달성 예정! 🎉)`
+        : `⏳ 승인 대기 중: +${pendingXP}%<br>(승인 완료 시 Lv.${projectedLevel} ${projectedRemainder}% 예정)`;
 }
 
 // --- Edit today's own pending entry (all fields, including stamps/titles,
