@@ -1434,9 +1434,11 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     background: rgba(245, 183, 56, 0.12);
 }
 
+/* Unread/read background is identical to a regular notification
+   (.notif-item.unread above) - once marked read it falls back to the
+   default (white) background like any other read item */
 .notif-item.stamp-request-notif-item {
     cursor: pointer;
-    background: rgba(245, 183, 56, 0.08);
 }
 
 .notif-item.stamp-request-notif-item:hover {

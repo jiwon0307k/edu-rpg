@@ -270,88 +270,68 @@ async function togglePenaltyType(id, active) {
 }
 
 // --- Stamp Request ("도장 조르기") Review, merged into the shared bell ---
-// notifications.js defines refreshNotifBadge()/loadNotifications() as plain
-// global function declarations. Redeclaring them here (admin.js loads after
-// notifications.js) overwrites those globals with versions that also fold
-// in pending stamp_requests - only on admin.html, since no other page loads
-// this file. The shared #notif-bell/#notif-dropdown click wiring in
-// notifications.js is untouched, so it keeps calling these (now merged)
-// functions by name exactly as before.
-async function refreshNotifBadge() {
-    const badge = document.getElementById('notif-count');
-    if (!badge || !window._notifUserId) return;
-
-    const [{ count: notifCount }, { count: stampCount }] = await Promise.all([
-        db.from('notifications')
-            .select('*', { count: 'exact', head: true })
-            .eq('recipient_id', window._notifUserId)
-            .eq('status', 'sent'),
-        db.from('stamp_requests')
-            .select('*', { count: 'exact', head: true })
-            .eq('status', 'pending')
-    ]);
-
-    const total = (notifCount || 0) + (stampCount || 0);
-    if (total > 0) {
-        badge.textContent = total;
-        badge.style.display = 'inline';
-    } else {
-        badge.style.display = 'none';
-    }
-}
-
+// A student's request now creates a real `notifications` row addressed to
+// the admin (value_type_name='stamp_request', stamp_request_id set) at
+// submit time (js/student.js submitStampRequest()), the same way a milestone
+// creates one for both student and admin. That means the shared
+// #notif-bell/#notif-dropdown wiring and refreshNotifBadge() from
+// notifications.js already work as-is for these - no badge-count override
+// needed here anymore. loadNotifications() is redeclared (admin.js loads
+// after notifications.js, so this global function replaces that one, on
+// admin.html only) purely to render stamp_request-type rows differently:
+// clicking the row opens the approval modal (and marks it read); the 읽음
+// button still just calls the same shared markAsRead().
 async function loadNotifications() {
     const list = document.getElementById('notif-list');
     if (!list || !window._notifUserId) return;
 
-    const [{ data: notifs }, { data: stampReqs }] = await Promise.all([
-        db.from('notifications')
-            .select('*')
-            .eq('recipient_id', window._notifUserId)
-            .order('created_at', { ascending: false })
-            .limit(20),
-        db.from('stamp_requests')
-            .select('*')
-            .eq('status', 'pending')
-            .order('created_at', { ascending: false })
-    ]);
+    const { data } = await db
+        .from('notifications')
+        .select('*')
+        .eq('recipient_id', window._notifUserId)
+        .order('created_at', { ascending: false })
+        .limit(20);
 
-    const stampHTML = (stampReqs || []).map((r, idx) => {
-        const num = String(idx + 1).padStart(2, '0');
-        const time = new Date(r.created_at).toLocaleDateString('ko-KR', {
-            month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
-        });
-        return `
-            <div class="notif-item stamp-request-notif-item" onclick="openStampRequestReviewModal()">
-                <div class="notif-content">
-                    <div class="notif-msg">${num} ${r.student_name} ${r.stamp_type} 가치도장 요청</div>
-                    <div class="notif-time">${time}</div>
-                </div>
-            </div>
-        `;
-    }).join('');
+    if (!data || data.length === 0) {
+        list.innerHTML = '<div class="notif-empty">알림이 없습니다.</div>';
+        return;
+    }
 
-    const notifHTML = (notifs || []).map(n => {
+    let stampRequestIndex = 0;
+    list.innerHTML = data.map(n => {
         const time = new Date(n.created_at).toLocaleDateString('ko-KR', {
             month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
         });
         const unread = n.status === 'sent' ? 'unread' : '';
+        const isStampRequest = n.value_type_name === 'stamp_request';
+
+        let msg = n.message;
+        if (isStampRequest) {
+            stampRequestIndex += 1;
+            msg = `${String(stampRequestIndex).padStart(2, '0')} ${msg}`;
+        }
+
+        const readBtnOnclick = isStampRequest
+            ? `event.stopPropagation(); markAsRead(${n.id})`
+            : `markAsRead(${n.id})`;
         const readBtn = n.status === 'sent'
-            ? `<button class="notif-read-btn" onclick="markAsRead(${n.id})">읽음</button>`
+            ? `<button class="notif-read-btn" onclick="${readBtnOnclick}">읽음</button>`
             : '';
+        const rowOnclick = isStampRequest
+            ? ` onclick="openStampRequestReviewModal(); markAsRead(${n.id});"`
+            : '';
+        const rowClass = isStampRequest ? `notif-item stamp-request-notif-item ${unread}` : `notif-item ${unread}`;
+
         return `
-            <div class="notif-item ${unread}" id="notif-${n.id}">
+            <div class="${rowClass}" id="notif-${n.id}"${rowOnclick}>
                 <div class="notif-content">
-                    <div class="notif-msg">${n.message}</div>
+                    <div class="notif-msg">${msg}</div>
                     <div class="notif-time">${time}</div>
                 </div>
                 ${readBtn}
             </div>
         `;
     }).join('');
-
-    const combined = stampHTML + notifHTML;
-    list.innerHTML = combined || '<div class="notif-empty">알림이 없습니다.</div>';
 }
 
 async function openStampRequestReviewModal() {
@@ -478,6 +458,22 @@ async function approveStampRequest(requestId) {
 
         await recalculateAndSaveXP(request.user_id);
 
+        // Let the student know, and clear the admin's own "new request" alert
+        // for this request (milestone_level: 0 keeps reconcileMilestoneNotifications
+        // from ever mistaking this for a stale value-type milestone and deleting it)
+        await db.from('notifications').insert({
+            recipient_id: request.user_id,
+            student_id: request.user_id,
+            value_type_name: 'stamp_request',
+            milestone_level: 0,
+            message: `[${valueType.name}] 가치도장 획득! 도장 조르기 요청이 승인되었어요.`
+        });
+
+        await db.from('notifications')
+            .update({ status: 'read' })
+            .eq('stamp_request_id', requestId)
+            .eq('status', 'sent');
+
         if (card) card.remove();
         await refreshNotifBadge();
 
@@ -508,6 +504,11 @@ async function rejectStampRequest(requestId) {
             .eq('id', requestId);
 
         if (error) throw error;
+
+        await db.from('notifications')
+            .update({ status: 'read' })
+            .eq('stamp_request_id', requestId)
+            .eq('status', 'sent');
 
         if (card) card.remove();
         await refreshNotifBadge();

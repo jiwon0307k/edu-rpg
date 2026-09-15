@@ -410,6 +410,16 @@ CREATE POLICY "stamp_requests_select" ON stamp_requests
 CREATE POLICY "stamp_requests_update_admin" ON stamp_requests
     FOR UPDATE USING (is_admin());
 
+-- 1n. notifications: link stamp-request notices back to their request -- RUN THIS NOW (not yet applied)
+-- (Submitting a request now inserts a real notifications row for the admin,
+-- the same way a milestone notifies both student and admin - this column
+-- lets the admin's approve/reject flow find and auto-mark that specific row
+-- read, and lets a future approval insert the student's own "승인되었어요"
+-- notification through the same shared bell/dropdown. ON DELETE SET NULL so
+-- deleting a stamp_requests row never cascades into deleting notification
+-- history.)
+ALTER TABLE notifications ADD COLUMN IF NOT EXISTS stamp_request_id UUID REFERENCES stamp_requests(id) ON DELETE SET NULL;
+
 -- ============================================
 -- SETUP INSTRUCTIONS
 -- ============================================

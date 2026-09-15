@@ -624,7 +624,7 @@ async function submitStampRequest() {
     if (submitBtn) submitBtn.disabled = true;
 
     try {
-        const { error } = await db
+        const { data: newRequest, error } = await db
             .from('stamp_requests')
             .insert({
                 user_id: currentProfile.id,
@@ -632,9 +632,32 @@ async function submitStampRequest() {
                 stamp_type: selected.dataset.name,
                 reason: reason,
                 status: 'pending'
-            });
+            })
+            .select()
+            .single();
 
         if (error) throw error;
+
+        // Notify the admin the same way a milestone does (milestone_level: 0
+        // is a sentinel so reconcileMilestoneNotifications never mistakes
+        // this for a stale value-type milestone). stamp_request_id lets the
+        // admin's approve/reject flow find and auto-mark this row read.
+        const { data: admins } = await db
+            .from('profiles')
+            .select('id')
+            .eq('role', 'admin');
+        const adminId = admins && admins.length > 0 ? admins[0].id : null;
+
+        if (adminId) {
+            await db.from('notifications').insert({
+                recipient_id: adminId,
+                student_id: currentProfile.id,
+                value_type_name: 'stamp_request',
+                milestone_level: 0,
+                message: `${currentProfile.name} ${selected.dataset.name} 가치도장 요청`,
+                stamp_request_id: newRequest.id
+            });
+        }
 
         closeStampRequestModal();
         alert('가치도장을 요청했어요! 선생님의 승인을 기다려주세요.');
