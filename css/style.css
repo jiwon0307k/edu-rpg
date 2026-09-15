@@ -1434,6 +1434,15 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     background: rgba(245, 183, 56, 0.12);
 }
 
+.notif-item.stamp-request-notif-item {
+    cursor: pointer;
+    background: rgba(245, 183, 56, 0.08);
+}
+
+.notif-item.stamp-request-notif-item:hover {
+    background: rgba(245, 183, 56, 0.18);
+}
+
 .notif-item .notif-content {
     flex: 1;
 }

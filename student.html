@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>경험치 통장 - 내 기록</title>
-    <link rel="stylesheet" href="css/style.css?v=20260915_stamp_request">
+    <link rel="stylesheet" href="css/style.css?v=20260915_bell_unify">
     <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
 </head>
 <body>
@@ -22,7 +22,7 @@
                 </div>
             </div>
             <a href="student-input.html" class="btn btn-small btn-primary">경험치 입력</a>
-            <button class="btn btn-small btn-secondary" onclick="openStampRequestFlow()">✨ 도장 조르기</button>
+            <button class="btn btn-small btn-primary" onclick="openStampRequestFlow()">도장 조르기</button>
             <button onclick="logout()" class="btn btn-small btn-secondary">로그아웃</button>
         </div>
     </nav>
@@ -136,7 +136,7 @@
         <div class="modal">
             <h3>이번 주에 이미 가치도장을 요청했어요!🥹</h3>
             <p class="text-muted" style="margin-left:0;">가치도장 조르기는 일주일에 한 번만 할 수 있어요. 다음 주 월요일에 다시 시도해주세요!</p>
-            <div class="form-actions">
+            <div class="form-actions" style="justify-content:center;">
                 <button class="btn btn-primary" onclick="closeStampRequestBlockedModal()">확인</button>
             </div>
         </div>

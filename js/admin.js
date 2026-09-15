@@ -12,7 +12,6 @@ let allPenaltyTypes = [];
     await initDoubleDayToggle();
     await loadValueTypes();
     await loadPenaltyTypes();
-    await refreshStampRequestBadge();
 })();
 
 // --- 2x XP Day Toggle ---
@@ -270,29 +269,98 @@ async function togglePenaltyType(id, active) {
     await loadPenaltyTypes();
 }
 
-// --- Stamp Request ("도장 조르기") Review ---
-// Separate from the shared notification bell (#notif-bell/notifications.js)
-// on purpose - a distinct #stamp-request-bell with its own badge/click
-// handler, so this doesn't fight with the shared bell's already-bound
-// dropdown-toggle listener.
-async function refreshStampRequestBadge() {
-    const badge = document.getElementById('stamp-request-count');
-    if (!badge) return;
+// --- Stamp Request ("도장 조르기") Review, merged into the shared bell ---
+// notifications.js defines refreshNotifBadge()/loadNotifications() as plain
+// global function declarations. Redeclaring them here (admin.js loads after
+// notifications.js) overwrites those globals with versions that also fold
+// in pending stamp_requests - only on admin.html, since no other page loads
+// this file. The shared #notif-bell/#notif-dropdown click wiring in
+// notifications.js is untouched, so it keeps calling these (now merged)
+// functions by name exactly as before.
+async function refreshNotifBadge() {
+    const badge = document.getElementById('notif-count');
+    if (!badge || !window._notifUserId) return;
 
-    const { count } = await db
-        .from('stamp_requests')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'pending');
+    const [{ count: notifCount }, { count: stampCount }] = await Promise.all([
+        db.from('notifications')
+            .select('*', { count: 'exact', head: true })
+            .eq('recipient_id', window._notifUserId)
+            .eq('status', 'sent'),
+        db.from('stamp_requests')
+            .select('*', { count: 'exact', head: true })
+            .eq('status', 'pending')
+    ]);
 
-    if (count > 0) {
-        badge.textContent = count;
+    const total = (notifCount || 0) + (stampCount || 0);
+    if (total > 0) {
+        badge.textContent = total;
         badge.style.display = 'inline';
     } else {
         badge.style.display = 'none';
     }
 }
 
+async function loadNotifications() {
+    const list = document.getElementById('notif-list');
+    if (!list || !window._notifUserId) return;
+
+    const [{ data: notifs }, { data: stampReqs }] = await Promise.all([
+        db.from('notifications')
+            .select('*')
+            .eq('recipient_id', window._notifUserId)
+            .order('created_at', { ascending: false })
+            .limit(20),
+        db.from('stamp_requests')
+            .select('*')
+            .eq('status', 'pending')
+            .order('created_at', { ascending: false })
+    ]);
+
+    const stampHTML = (stampReqs || []).map((r, idx) => {
+        const num = String(idx + 1).padStart(2, '0');
+        const time = new Date(r.created_at).toLocaleDateString('ko-KR', {
+            month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+        });
+        return `
+            <div class="notif-item stamp-request-notif-item" onclick="openStampRequestReviewModal()">
+                <div class="notif-content">
+                    <div class="notif-msg">${num} ${r.student_name} ${r.stamp_type} 가치도장 요청</div>
+                    <div class="notif-time">${time}</div>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    const notifHTML = (notifs || []).map(n => {
+        const time = new Date(n.created_at).toLocaleDateString('ko-KR', {
+            month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+        });
+        const unread = n.status === 'sent' ? 'unread' : '';
+        const readBtn = n.status === 'sent'
+            ? `<button class="notif-read-btn" onclick="markAsRead(${n.id})">읽음</button>`
+            : '';
+        return `
+            <div class="notif-item ${unread}" id="notif-${n.id}">
+                <div class="notif-content">
+                    <div class="notif-msg">${n.message}</div>
+                    <div class="notif-time">${time}</div>
+                </div>
+                ${readBtn}
+            </div>
+        `;
+    }).join('');
+
+    const combined = stampHTML + notifHTML;
+    list.innerHTML = combined || '<div class="notif-empty">알림이 없습니다.</div>';
+}
+
 async function openStampRequestReviewModal() {
+    // Close the notification dropdown first, in case this was opened by
+    // clicking a stamp-request row inside it
+    const dropdown = document.getElementById('notif-dropdown');
+    if (dropdown) dropdown.classList.remove('open');
+    notifDropdownOpen = false;
+
     await loadStampRequestCards();
     document.getElementById('stamp-request-review-modal').style.display = 'flex';
 }
@@ -331,6 +399,7 @@ async function loadStampRequestCards() {
                 <p class="stamp-request-reason">${r.reason}</p>
                 <div class="form-actions">
                     <button class="btn btn-small btn-primary" onclick="approveStampRequest('${r.id}')">승인</button>
+                    <button class="btn btn-small btn-secondary" onclick="rejectStampRequest('${r.id}')">거절</button>
                 </div>
             </div>
         `;
@@ -344,8 +413,7 @@ async function approveStampRequest(requestId) {
     stampRequestsBeingApproved.add(requestId);
 
     const card = document.getElementById(`stamp-request-${requestId}`);
-    const btn = card ? card.querySelector('button') : null;
-    if (btn) btn.disabled = true;
+    if (card) card.querySelectorAll('button').forEach(b => b.disabled = true);
 
     try {
         const { data: request } = await db
@@ -411,7 +479,7 @@ async function approveStampRequest(requestId) {
         await recalculateAndSaveXP(request.user_id);
 
         if (card) card.remove();
-        await refreshStampRequestBadge();
+        await refreshNotifBadge();
 
         const list = document.getElementById('stamp-request-review-list');
         if (list && list.children.length === 0) {
@@ -420,7 +488,38 @@ async function approveStampRequest(requestId) {
     } catch (err) {
         console.error('Stamp request approval failed:', err);
         alert('승인 처리 중 오류가 발생했습니다. 다시 시도해주세요.');
-        if (btn) btn.disabled = false;
+        if (card) card.querySelectorAll('button').forEach(b => b.disabled = false);
+    } finally {
+        stampRequestsBeingApproved.delete(requestId);
+    }
+}
+
+async function rejectStampRequest(requestId) {
+    if (stampRequestsBeingApproved.has(requestId)) return;
+    stampRequestsBeingApproved.add(requestId);
+
+    const card = document.getElementById(`stamp-request-${requestId}`);
+    if (card) card.querySelectorAll('button').forEach(b => b.disabled = true);
+
+    try {
+        const { error } = await db
+            .from('stamp_requests')
+            .update({ status: 'rejected' })
+            .eq('id', requestId);
+
+        if (error) throw error;
+
+        if (card) card.remove();
+        await refreshNotifBadge();
+
+        const list = document.getElementById('stamp-request-review-list');
+        if (list && list.children.length === 0) {
+            document.getElementById('stamp-request-review-empty').style.display = 'block';
+        }
+    } catch (err) {
+        console.error('Stamp request rejection failed:', err);
+        alert('거절 처리 중 오류가 발생했습니다. 다시 시도해주세요.');
+        if (card) card.querySelectorAll('button').forEach(b => b.disabled = false);
     } finally {
         stampRequestsBeingApproved.delete(requestId);
     }
