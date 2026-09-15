@@ -285,6 +285,8 @@ async function loadNotifications() {
     const list = document.getElementById('notif-list');
     if (!list || !window._notifUserId) return;
 
+    bindStampRequestNotifClicks();
+
     const { data } = await db
         .from('notifications')
         .select('*')
@@ -311,19 +313,15 @@ async function loadNotifications() {
             msg = `${String(stampRequestIndex).padStart(2, '0')} ${msg}`;
         }
 
-        const readBtnOnclick = isStampRequest
-            ? `event.stopPropagation(); markAsRead(${n.id})`
-            : `markAsRead(${n.id})`;
         const readBtn = n.status === 'sent'
-            ? `<button class="notif-read-btn" onclick="${readBtnOnclick}">읽음</button>`
-            : '';
-        const rowOnclick = isStampRequest
-            ? ` onclick="openStampRequestReviewModal(); markAsRead(${n.id});"`
+            ? `<button class="notif-read-btn" onclick="markAsRead(${n.id})">읽음</button>`
             : '';
         const rowClass = isStampRequest ? `notif-item stamp-request-notif-item ${unread}` : `notif-item ${unread}`;
 
+        // data-notif-id (not an inline onclick) is what the delegated click
+        // handler below reads for stamp-request rows - see bindStampRequestNotifClicks()
         return `
-            <div class="${rowClass}" id="notif-${n.id}"${rowOnclick}>
+            <div class="${rowClass}" id="notif-${n.id}" data-notif-id="${n.id}">
                 <div class="notif-content">
                     <div class="notif-msg">${msg}</div>
                     <div class="notif-time">${time}</div>
@@ -334,15 +332,64 @@ async function loadNotifications() {
     }).join('');
 }
 
+// Delegated click handler for stamp-request notification rows, bound once
+// to the persistent #notif-list container (not per-render, since
+// loadNotifications() rebuilds its children on every dropdown open - a
+// listener attached to the container survives that innerHTML replacement,
+// unlike one attached directly to a row). This replaced an earlier version
+// that put onclick="openStampRequestReviewModal(); markAsRead(...)" directly
+// on the row: functionally correct on its own, but fragile - any future
+// change to how `msg`/other row data gets interpolated into that inline
+// attribute string was one bad character away from corrupting the HTML and
+// silently killing the click handler with no console error at all.
+// Delegation avoids building executable JS as an HTML attribute string, so
+// there's nothing left to corrupt.
+function bindStampRequestNotifClicks() {
+    const list = document.getElementById('notif-list');
+    if (!list || list.dataset.stampClickBound === 'true') return;
+    list.dataset.stampClickBound = 'true';
+
+    list.addEventListener('click', (e) => {
+        // Let the read button's own onclick="markAsRead(...)" handle itself;
+        // don't also treat that click as "open the review modal"
+        if (e.target.closest('.notif-read-btn')) return;
+
+        const item = e.target.closest('.stamp-request-notif-item');
+        if (!item) return;
+
+        if (typeof openStampRequestReviewModal === 'function') {
+            openStampRequestReviewModal();
+        } else {
+            console.error('openStampRequestReviewModal is not defined - stamp request modal cannot open');
+        }
+
+        const notifId = parseInt(item.dataset.notifId, 10);
+        if (!isNaN(notifId) && typeof markAsRead === 'function') {
+            markAsRead(notifId);
+        }
+    });
+}
+
 async function openStampRequestReviewModal() {
+    const modal = document.getElementById('stamp-request-review-modal');
+    if (!modal) {
+        console.error('#stamp-request-review-modal not found in the DOM');
+        return;
+    }
+
     // Close the notification dropdown first, in case this was opened by
     // clicking a stamp-request row inside it
     const dropdown = document.getElementById('notif-dropdown');
     if (dropdown) dropdown.classList.remove('open');
     notifDropdownOpen = false;
 
-    await loadStampRequestCards();
-    document.getElementById('stamp-request-review-modal').style.display = 'flex';
+    try {
+        await loadStampRequestCards();
+    } catch (err) {
+        console.error('Failed to load stamp request cards:', err);
+    }
+
+    modal.style.display = 'flex';
 }
 
 function closeStampRequestReviewModal() {
