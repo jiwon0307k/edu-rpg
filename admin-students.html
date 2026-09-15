@@ -288,6 +288,18 @@
         </div>
     </div>
 
+    <!-- Stamp Request ("도장 조르기") Review Modal -->
+    <div class="modal-overlay" id="stamp-request-review-modal" style="display:none;">
+        <div class="modal modal-wide">
+            <h3>🔔 도장 조르기 요청함</h3>
+            <div id="stamp-request-review-list"></div>
+            <p id="stamp-request-review-empty" class="text-center text-muted" style="display:none;">대기 중인 요청이 없습니다.</p>
+            <div class="form-actions">
+                <button class="btn btn-secondary" onclick="closeStampRequestReviewModal()">닫기</button>
+            </div>
+        </div>
+    </div>
+
     <div id="toast-container"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.100.1"></script>
@@ -299,6 +311,6 @@
     <script src="js/stamp-groups.js?v=20260906_royal_gold"></script>
     <script src="js/double-day.js?v=20260906_ui3"></script>
     <script src="js/admin-batch-entry.js?v=20260906_ui3"></script>
-    <script src="js/admin-students.js?v=20260915_penalty_ui"></script>
+    <script src="js/admin-students.js?v=20260916_notif_fix"></script>
 </body>
 </html>
